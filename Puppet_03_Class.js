@@ -244,7 +244,7 @@ class Puppet {
      */
     showPart(b) { // shows the part of the body 
         if (Object.hasOwn(this.show_map, b)) {
-            this.show_map[s] = true;
+            this.show_map[b] = true;
         }
         else if (b == "arm_r") {
             this.showPart('upper_arm_r');
@@ -271,13 +271,13 @@ class Puppet {
         }
     }
     hideAll() { // hides all of the puppets body parts
-        for (let s in this.show_map) {
-            this.hidePart(s);
+        for (let b in this.show_map) {
+            this.hidePart(b);
         }
     }
     showAll() { // shows all of the puppets body parts
-        for (let s in this.show_map) {
-            this.showPart(s);
+        for (let b in this.show_map) {
+            this.showPart(b);
         }
     }
     /**
@@ -285,12 +285,12 @@ class Puppet {
      */
     hideExcept(b) { // hides all body parts except the one given
         this.hideAll();
-        this.showPart(s);
+        this.showPart(b);
     }
 
     
 
-    display( time_current ) { 
+    display( time_current = 0 ) { 
         push();
 
         // ROTATIONS OF FULL_BODY WILL BE PLACED HERE

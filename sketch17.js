@@ -197,6 +197,26 @@ function keyPressed() {
 // -------------------- AI GENERATED NOW END --------------------
 }
 
+function initialText() {
+	if (!song.isPlaying()) {
+		songTime = 0;
+		// background(255, 0, 0);
+		textFont(fontBeforeStart);
+		textSize(24);
+		fill(255, 255, 255,);
+		textAlign(CENTER, CENTER);
+		text('Press "Space" to play the song', 0, 0);
+  	}
+}
+
+function findTimeCurrent() {
+	let time_current1 = song.currentTime(); // time in seconds according to the music
+	let time_current2 = floor(time_current1 * framerate) / framerate;; // transform time in steps of 1/framerate with floor(time*fps)/fps
+	let time_current = handleEditorMode(time_current2);
+	
+	console.log('time_current1:',time_current1,'time_current2:', time_current2, 'time_current3:', time_current); // print time_current2 and time_current3 to see the difference
+	return time_current;
+}
 
 
 // -------------------- AI GENERATED NOW START --------------------
@@ -232,15 +252,15 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
-let [ frame_start, frame_end ] = [ 30 , 93 ]; // has the same unit as the keyframe_version variable
+let [ frame_start, frame_end ] = [ 0 , 120 ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
 
-/** @type {Hand} */
-let hand;
-/** @type {Puppet} */
-let puppet;
-let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
+// let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
+
+/** @type {Puppet} */
+let puppet_head, puppet_body, puppet_arm_r, puppet_arm_l, puppet_leg_r, puppet_leg_l;
+let camera_kf_list = [];
 
 
 function setup() {
@@ -249,9 +269,8 @@ function setup() {
 
 	noStroke();
 
-	initPuppetVariables(); // initializes the variables for the puppet (the joint positions and colors)
-	initPuppetGeometries(); // initializes the geometries for the puppet (the body parts)
-	initHandVariablesAndGeometries(); // initializes the geometries for the hand (the palm and fingers)
+	initPuppetVariables(); initPuppetGeometries(); // initializes the variables and geometries for the puppet
+	initHandVariablesAndGeometries(); // initializes the variables and geometries for the hand
 	setupEditorUI();
 
 
@@ -259,18 +278,47 @@ function setup() {
 	// Create hand once and keep it for all frames
 	// hand = new Hand(); 
 
-	puppet = new Puppet();
 
-	puppet.hidePart('head');
+	puppet_head = new Puppet(); puppet_head.hideExcept('head'); 
+	puppet_body = new Puppet(); puppet_body.hideExcept('body');
+	puppet_arm_r = new Puppet(); puppet_arm_r.hideExcept('arm_r');
+	puppet_arm_l = new Puppet(); puppet_arm_l.hideExcept('arm_l');
+	puppet_leg_r = new Puppet(); puppet_leg_r.hideExcept('leg_r');
+	puppet_leg_l = new Puppet(); puppet_leg_l.hideExcept('leg_l');
+	
+	// KeyFrames for the puppet's dismantled body parts
+	puppet_head.addRotationX('neck', new KeyFrame(0, 90));
+	puppet_body.addRotationX('full_body', new KeyFrame(0, -90));
+	puppet_arm_r.addRotation('shoulder_r', new KeyFrame(0, [-90,-100,0]));
+	puppet_arm_r.addRotation('elbow_r', new KeyFrame(0, [60,0,0]));
+	puppet_arm_l.addRotation('shoulder_l', new KeyFrame(0, [-90,-90,0]));
+	puppet_arm_l.addRotation('elbow_l', new KeyFrame(0, [60,0,0]));
+	puppet_leg_r.addRotation('hips_leg_r', new KeyFrame(0, [90,-90,0]));
+	puppet_leg_r.addRotation('knee_r', new KeyFrame(0, [-70,0,0]));
+	puppet_leg_l.addRotation('hips_leg_l', new KeyFrame(0, [90,-90,0]));
+	puppet_leg_l.addRotation('knee_l', new KeyFrame(0, [-70,0,0]));
+
+
+	// Keyframes for the camera
+
+	camera_kf_list.push(new KeyFrame(0, [0,0,0,0,0,0], 'constant'));
+	camera_kf_list.push(new KeyFrame(51, [124, -556, 391, 153, -513, 453], 'constant'));
+	camera_kf_list.push(new KeyFrame(61, [426, -501, -482, 676, -256, -119], 'constant'));
+	camera_kf_list.push(new KeyFrame(71, [-1108, -1862, -2118, 80, 10, 45], 'constant'));
+	camera_kf_list.push(new KeyFrame(83, [-1751, -2875, -3289, 80, 10, 45], 'constant'));
+	camera_kf_list.push(new KeyFrame(94, [0,0,0,0,0,0], 'constant'));
+	// camera_kf_list.push(new KeyFrame(83, [-2782, -4499, -5165, 80, 10, 45], 'constant'));
+
+	// puppet_arm_l.addRotationX('shoulder_l', new KeyFrame(0, 90));
+
+	// puppet.hidePart('head');
 
 	// puppet.addRotationZ('shoulder_l', new KeyFrame(0, 90));
-	puppet.addRotationZ('shoulder_r', new KeyFrame(0, 45, 'constant'));
-	puppet.addRotationZ('shoulder_r', new KeyFrame(51, 0, 'constant'));
-	puppet.addRotationZ('shoulder_r', new KeyFrame(61, -90, 'constant'));
-	puppet.addRotationZ('shoulder_r', new KeyFrame(71, -180, 'constant'));
-	puppet.addRotationZ('shoulder_r', new KeyFrame(83, -180-90, 'constant'));
-	// puppet.addRotationZ('shoulder_r', new KeyFrame(58, 0, 'constant'));
-	// puppet.addRotationZ('shoulder_r', new KeyFrame(200, 90, 'constant'));
+	// puppet.addRotationZ('shoulder_r', new KeyFrame(0, 45, 'constant'));
+	// puppet.addRotationZ('shoulder_r', new KeyFrame(51, 0, 'constant'));
+	// puppet.addRotationZ('shoulder_r', new KeyFrame(61, -90, 'constant'));
+	// puppet.addRotationZ('shoulder_r', new KeyFrame(71, -180, 'constant'));
+	// puppet.addRotationZ('shoulder_r', new KeyFrame(83, -180-90, 'constant'));
 
 
 
@@ -279,67 +327,88 @@ function setup() {
 	// camera(0, 133, 3958, 59, -853, 33)
 	// camera(0, 16, 3987, 59, -970, 62)
 	// camera(211, -2554, 1624, -160, -1615, -354)
+	camera(-1751, -2875, -3289, 80, 10, 45)
+
+	
+
 }
 
-let time_current1;
-let time_current2;
 let time_current;
 
 function draw() {
 	clear();
 	background(50);
+	perspective(2*atan(height/2/800),width/height,0.1*800, 30 * 800);
 	orbitControl();
-
-	if (!song.isPlaying()) {
-		songTime = 0;
-		// background(255, 0, 0);
-		textFont(fontBeforeStart);
-		textSize(24);
-		fill(255, 255, 255,);
-		textAlign(CENTER, CENTER);
-		text('Press "Space" to play the song', 0, 0);
-  	}
-
-
-
-	// CHANGE LATER - these time_current numbered were for debugging, so later you can change them to just time_current
-	time_current1 = song.currentTime(); // time in seconds according to the music
-	time_current2 = floor(time_current1 * framerate) / framerate;; // transform time in steps of 1/framerate with floor(time*fps)/fps
-
-	// console.log(time_current2);
-	
-	time_current = handleEditorMode(time_current2);
-	
-	// print time_current2 and time_current3 to see the difference
-	console.log('time_current1:',time_current1,'time_current2:', time_current2, 'time_current3:', time_current);
-
-
-	// draw each axis
-
+	// initial text before the song starts
+	initialText();
+	// figure time_current based on song, editor mode, and framerate
+	time_current = findTimeCurrent();
+	// code for debugging (axes)
 	if (typeof debug_axes !== 'undefined' && debug_axes) {
-		stroke(255, 0, 0);
-		line(0, 0, 0, 100, 0, 0);
-		stroke(0, 255, 0);
-		line(0, 0, 0, 0, 100, 0);
-		stroke(0, 0, 255);
-		line(0, 0, 0, 0, 0, 100);
-		stroke(0,0,0)
-
 		push();
-		fill(255, 0, 0,100);
-		translate(0, -700, -700);
-		box(100);
+		strokeWeight(9);
+		stroke(255, 0, 0);
+		line(0, 0, 0, 500, 0, 0);
+		stroke(0, 255, 0);
+		line(0, 0, 0, 0, 500, 0);
+		stroke(0, 0, 255);
+		line(0, 0, 0, 0, 0, 500);
 		pop();
+		stroke(0,0,0);
 	}
 
 
+	// Camera ----------------------
+	camera(...animate_kfs(time_current, camera_kf_list));
 
-	push();
-	translate(0, 0, 0);
-	scale(0.5);
-	puppet.display(time_current);
+
+	// Puppet --------------------
+	push(); // head
+		translate(300, -40, 1000);
+		rotateY(PI+PI/2);
+		rotateX(-PI/8);
+		puppet_head.display();
 	pop();
 
+	push(); // body
+		translate(0, -40, 0);
+		puppet_body.display();
+	pop();
+
+	// Arms
+	push(); 
+		translate(800, -65, 200);
+		rotateY(-PI/2+PI/8);
+		puppet_arm_r.display();
+	pop();
+	push();
+		translate(-500, -65, 600);
+		rotateY(PI/2);
+		puppet_arm_l.display();
+	pop();
+
+	// Legs
+	push();
+		translate(400, -280, -700);
+		rotateY(PI-PI/4);
+		puppet_leg_r.display();
+	pop();
+	push();
+		translate(-600, 230, -700);
+		rotateX(PI);
+		rotateY(-PI+PI/4);
+		puppet_leg_l.display();
+	pop();
+
+	// Plane for testing
+	push();
+	translate(0, 3, 0);
+	rotateX(PI/2);
+	noStroke();
+	// fill(60);
+	// plane(4000);
+	pop();
 
 
 	

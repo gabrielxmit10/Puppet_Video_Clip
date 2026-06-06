@@ -127,10 +127,10 @@ function animate_kfs(time_current, kf_list) { // takes the current time in secon
         throw new Error("No keyframes in the list given to animate_kfs()");
     }
 
-    // If there is only 1 keyframe, return its value (in number or p5.Vector if it is an array)
+    // If there is only 1 keyframe, return its value (in number, array, or p5.Vector)
     if (kf_list.length == 1) {
         let val = kf_list[0].value;
-        return Array.isArray(val) ? createVector(...val) : val;
+        return Array.isArray(val) ? (val.length > 3 ? val : createVector(...val)) : val;
     }
 
     let frame_current = time_current * keyframe_version; // convert time_current to keyframe space
@@ -138,10 +138,10 @@ function animate_kfs(time_current, kf_list) { // takes the current time in secon
     // if frameNumber is outside the range of keyframes, return the value of the closest keyframe
 	if (frame_current < kf_list[0].time) {
 		let val = kf_list[0].value;
-		return Array.isArray(val) ? createVector(...val) : val;
+		return Array.isArray(val) ? (val.length > 3 ? val : createVector(...val)) : val;
 	} else if (frame_current > kf_list[kf_list.length - 1].time) {
 		let val = kf_list[kf_list.length - 1].value;
-		return Array.isArray(val) ? createVector(...val) : val;
+		return Array.isArray(val) ? (val.length > 3 ? val : createVector(...val)) : val;
 	}
 
 	// if frameNumber is within the range of keyframes, 
@@ -250,7 +250,7 @@ function interpolate_values(value1, value2, t_new) { // handles the structure of
         for (let i = 0; i < value1.length; i++) {
             result[i] = lerp(value1[i], value2[i], t_new);
         }
-        return createVector(...result);
+        return result.length > 3 ? result : createVector(...result);
     }
 
     // Handle single numbers

@@ -1,8 +1,13 @@
 /// <reference path="./Puppet_03_Class.js" />
 /// <reference path="./Hand_03_Class.js" />
+/// <reference path="./Scene_Class.js" />
+/// <reference path="./Scene_01_Dismantled.js" />
 
 
 
+
+
+// ------------------------------ AI GENERATED START ------------------------------
 let editor_frame;
 let editor_slider;
 let editor_input;
@@ -10,16 +15,12 @@ let is_playing = false;
 let btn_play;
 let editor_step = 1;
 let cam_info_input;
-
-// AI GENERATED
 function updateEditorUI() {
 	if (editor_slider && editor_input) {
 		editor_slider.value(editor_frame);
 		editor_input.value(Math.round(editor_frame * 100) / 100);
 	}
 }
-
-// AI GENERATED
 function setupEditorUI() {
 	editor_frame = frame_start;
 	if (editor_mode === 'editor' || editor_mode === 'editor_forward') {
@@ -96,7 +97,6 @@ function setupEditorUI() {
 		cam_info_input.size(300);
 	}
 }
-
 function handleEditorMode(time_current) {
 	if (editor_mode === 'animation' || editor_mode === '') { }
 	else if (editor_mode === 'fixed') {
@@ -160,6 +160,7 @@ function handleEditorMode(time_current) {
 	}
 	return time_current;
 }
+// ------------------------------ AI GENERATED END ------------------------------
 
 
 
@@ -196,7 +197,6 @@ function keyPressed() {
   }
 // -------------------- AI GENERATED NOW END --------------------
 }
-
 function initialText() {
 	if (!song.isPlaying()) {
 		songTime = 0;
@@ -208,13 +208,17 @@ function initialText() {
 		text('Press "Space" to play the song', 0, 0);
   	}
 }
-
 function findTimeCurrent() {
-	let time_current1 = song.currentTime(); // time in seconds according to the music
-	let time_current2 = floor(time_current1 * framerate) / framerate;; // transform time in steps of 1/framerate with floor(time*fps)/fps
-	let time_current = handleEditorMode(time_current2);
+	// REMOVE LATER
+	// let time_current1 = song.currentTime(); // time in seconds according to the music
+	// let time_current2 = floor(time_current1 * framerate) / framerate;; // transform time in steps of 1/framerate with floor(time*fps)/fps
+	// let time_current = handleEditorMode(time_current2);
+	// console.log('time_current1:',time_current1,'time_current2:', time_current2, 'time_current3:', time_current); // print time_current2 and time_current3 to see the difference
+
+	let time_current = song.currentTime(); // time in seconds according to the music
+	time_current = floor(time_current * framerate) / framerate;; // transform time in steps of 1/framerate with floor(time*fps)/fps
+	time_current = handleEditorMode(time_current);
 	
-	console.log('time_current1:',time_current1,'time_current2:', time_current2, 'time_current3:', time_current); // print time_current2 and time_current3 to see the difference
 	return time_current;
 }
 
@@ -226,23 +230,17 @@ let global_finger_pos;
 function getGlobalPosition() {
 	// Steal the current world matrix directly from the p5 renderer
 	let m = _renderer.uModelMatrix.mat4;
-	
 	// The 12th, 13th, and 14th values hold the exact absolute X, Y, and Z
 	return createVector(m[12], m[13], m[14]);
 }
 // -------------------- AI GENERATED NOW END --------------------
 
-// REMOVE LATER (i just ended up doing it inline and the name is unintuitive)
-// function time_to_frame(time) { // takes time in seconds and transforms it to steps of 1/framerate with floor(time*fps)/fps
-// 	return floor(time * framerate) / framerate;
-// }
 
-let canvas_width = 600;
-let canvas_height = 600;
 
+// ---------------------------------------- GLOBAL VARIABLES ----------------------------------------
+let canvas_width = 600; let canvas_height = 600;
 let keyframe_version = 24; // This represents the unit of frames we use in our keyframe list
 let framerate = 24; // This represents the framerate of our animation
-
 let editor_mode = 'editor';
 // 'animation' or '' - runs the animation
 // 'fixed' - fixes the animation at a frame frame_start
@@ -254,13 +252,9 @@ let editor_mode = 'editor';
 
 let [ frame_start, frame_end ] = [ 0 , 120 ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
-
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
-
-/** @type {Puppet} */
-let puppet_head, puppet_body, puppet_arm_r, puppet_arm_l, puppet_leg_r, puppet_leg_l;
-let camera_kf_list = [];
+let scenes_list = [];
 
 
 function setup() {
@@ -273,61 +267,11 @@ function setup() {
 	initHandVariablesAndGeometries(); // initializes the variables and geometries for the hand
 	setupEditorUI();
 
+	// Create Each Scene and add it to the scenes list
+	scenes_list.push(new Scene_01_Dismantled(51, 94));
 
-
-	// Create hand once and keep it for all frames
-	// hand = new Hand(); 
-
-
-	puppet_head = new Puppet(); puppet_head.hideExcept('head'); 
-	puppet_body = new Puppet(); puppet_body.hideExcept('body');
-	puppet_arm_r = new Puppet(); puppet_arm_r.hideExcept('arm_r');
-	puppet_arm_l = new Puppet(); puppet_arm_l.hideExcept('arm_l');
-	puppet_leg_r = new Puppet(); puppet_leg_r.hideExcept('leg_r');
-	puppet_leg_l = new Puppet(); puppet_leg_l.hideExcept('leg_l');
-	
-	// KeyFrames for the puppet's dismantled body parts
-	puppet_head.addRotationX('neck', new KeyFrame(0, 90));
-	puppet_body.addRotationX('full_body', new KeyFrame(0, -90));
-	puppet_arm_r.addRotation('shoulder_r', new KeyFrame(0, [-90,-100,0]));
-	puppet_arm_r.addRotation('elbow_r', new KeyFrame(0, [60,0,0]));
-	puppet_arm_l.addRotation('shoulder_l', new KeyFrame(0, [-90,-90,0]));
-	puppet_arm_l.addRotation('elbow_l', new KeyFrame(0, [60,0,0]));
-	puppet_leg_r.addRotation('hips_leg_r', new KeyFrame(0, [90,-90,0]));
-	puppet_leg_r.addRotation('knee_r', new KeyFrame(0, [-70,0,0]));
-	puppet_leg_l.addRotation('hips_leg_l', new KeyFrame(0, [90,-90,0]));
-	puppet_leg_l.addRotation('knee_l', new KeyFrame(0, [-70,0,0]));
-
-
-	// Keyframes for the camera
-
-	camera_kf_list.push(new KeyFrame(0, [0,0,0,0,0,0], 'constant'));
-	camera_kf_list.push(new KeyFrame(51, [124, -556, 391, 153, -513, 453], 'constant'));
-	camera_kf_list.push(new KeyFrame(61, [426, -501, -482, 676, -256, -119], 'constant'));
-	camera_kf_list.push(new KeyFrame(71, [-1108, -1862, -2118, 80, 10, 45], 'constant'));
-	camera_kf_list.push(new KeyFrame(83, [-1751, -2875, -3289, 80, 10, 45], 'constant'));
-	camera_kf_list.push(new KeyFrame(94, [0,0,0,0,0,0], 'constant'));
-	// camera_kf_list.push(new KeyFrame(83, [-2782, -4499, -5165, 80, 10, 45], 'constant'));
-
-	// puppet_arm_l.addRotationX('shoulder_l', new KeyFrame(0, 90));
-
-	// puppet.hidePart('head');
-
-	// puppet.addRotationZ('shoulder_l', new KeyFrame(0, 90));
-	// puppet.addRotationZ('shoulder_r', new KeyFrame(0, 45, 'constant'));
-	// puppet.addRotationZ('shoulder_r', new KeyFrame(51, 0, 'constant'));
-	// puppet.addRotationZ('shoulder_r', new KeyFrame(61, -90, 'constant'));
-	// puppet.addRotationZ('shoulder_r', new KeyFrame(71, -180, 'constant'));
-	// puppet.addRotationZ('shoulder_r', new KeyFrame(83, -180-90, 'constant'));
-
-
-
-	camera(0,-500,1500, 0,-500,0)
-	camera(0,0,1500, 0,0,0)
-	// camera(0, 133, 3958, 59, -853, 33)
-	// camera(0, 16, 3987, 59, -970, 62)
-	// camera(211, -2554, 1624, -160, -1615, -354)
-	camera(-1751, -2875, -3289, 80, 10, 45)
+	// camera(1532, -17, 93, 33, -1, 81)
+	// camera(-1751, -2875, -3289, 80, 10, 45)
 
 	
 
@@ -344,7 +288,7 @@ function draw() {
 	initialText();
 	// figure time_current based on song, editor mode, and framerate
 	time_current = findTimeCurrent();
-	// code for debugging (axes)
+	// code for debugging (axes, plane)
 	if (typeof debug_axes !== 'undefined' && debug_axes) {
 		push();
 		strokeWeight(9);
@@ -356,62 +300,26 @@ function draw() {
 		line(0, 0, 0, 0, 0, 500);
 		pop();
 		stroke(0,0,0);
+
+		push();
+		translate(0, 3, 0);
+		rotateX(PI/2);
+		noStroke();
+		// fill(60);
+		plane(4000);
+		pop();
+	}
+	
+
+	// Run Scenes ----------------------
+	for (let scene of scenes_list) {
+		if (scene.isActive(time_current * keyframe_version)) {
+			scene.display(time_current);
+		}
 	}
 
 
-	// Camera ----------------------
-	camera(...animate_kfs(time_current, camera_kf_list));
-
-
-	// Puppet --------------------
-	push(); // head
-		translate(300, -40, 1000);
-		rotateY(PI+PI/2);
-		rotateX(-PI/8);
-		puppet_head.display();
-	pop();
-
-	push(); // body
-		translate(0, -40, 0);
-		puppet_body.display();
-	pop();
-
-	// Arms
-	push(); 
-		translate(800, -65, 200);
-		rotateY(-PI/2+PI/8);
-		puppet_arm_r.display();
-	pop();
-	push();
-		translate(-500, -65, 600);
-		rotateY(PI/2);
-		puppet_arm_l.display();
-	pop();
-
-	// Legs
-	push();
-		translate(400, -280, -700);
-		rotateY(PI-PI/4);
-		puppet_leg_r.display();
-	pop();
-	push();
-		translate(-600, 230, -700);
-		rotateX(PI);
-		rotateY(-PI+PI/4);
-		puppet_leg_l.display();
-	pop();
-
-	// Plane for testing
-	push();
-	translate(0, 3, 0);
-	rotateX(PI/2);
-	noStroke();
-	// fill(60);
-	// plane(4000);
-	pop();
-
-
-	
+	// ------------------------------ AI GENERATED START: OrbitControl Camera Info UI ------------------------------
 	// Update Camera Info UI
 	if ((editor_mode === 'editor' || editor_mode === 'editor_forward') && cam_info_input) {
 		let cam = _renderer._curCamera; // Grabs the active p5.Camera
@@ -421,7 +329,7 @@ function draw() {
 			cam_info_input.value(str);
 		}
 	}
-
+	// ------------------------------ AI GENERATED END: OrbitControl Camera Info UI ------------------------------
 }
 
 

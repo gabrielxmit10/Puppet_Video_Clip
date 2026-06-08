@@ -74,6 +74,9 @@ class Puppet {
             'neck': this.neck_rot_kfs,
         };
 
+        // Procedural animations map
+        this.procedural_functions = {};
+
         // Visibility map for body parts
         this.show_map = {
             // you can also hide groups like "arm_r" or "leg_l"
@@ -187,19 +190,43 @@ class Puppet {
         }
     }
 
-    #applyRotation(time_current, rkf_list){ // takes a list of rotation keyframes and applies the correct rotation for the current time (will be called in display)
-        
-        // check modes to rotate in the right order with the value from animate_kfs(time_current, kf_list)
+    /**
+     * @param {JointsNamesPuppet} s
+     * @param {Function} func - function(time_current, [kf_x, kf_y, kf_z]) => [new_x, new_y, new_z]
+     */
+    addProcedural(s, func) { // adds a procedural transformation to the ending values of the kfs interpolation
+        if (this.rot_kfs_map[s]) { // tests if s is one of the joints before adding the procedural function
+            this.procedural_functions[s] = func;
+        } else { // else it throws an error
+            throw new Error('Joint ' + s + ' not found for addProcedural()');
+        }
+    }
 
+    #applyRotation(time_current, rkf_list, joint_name = null){ // takes a list of rotation keyframes and applies the correct rotation for the current time, interpolating (animate_kfs) and applying procedural functions (if they exist)
+        
+        // 1. Calculate base keyframe values (interpolate to the current time)
+        let rot_x = rkf_list.x.length > 0 ? animate_kfs(time_current, rkf_list.x) : 0;
+        let rot_y = rkf_list.y.length > 0 ? animate_kfs(time_current, rkf_list.y) : 0;
+        let rot_z = rkf_list.z.length > 0 ? animate_kfs(time_current, rkf_list.z) : 0;
+
+        // 2. If a procedural function exists, pass the time and the base keyframe values, and let the user return the final values!
+        if (joint_name && this.procedural_functions[joint_name]) {
+            let result = this.procedural_functions[joint_name](time_current, [rot_x, rot_y, rot_z]);
+            rot_x = result[0];
+            rot_y = result[1];
+            rot_z = result[2];
+        }
+
+        // 3. Apply the rotations in the correct order based on the mode
         for (let i = 0; i < rkf_list.mode.length; i++) { 
             if (rkf_list.mode[i] == 'X') {
-                if (rkf_list.x.length > 0) rotateX( radians( animate_kfs(time_current, rkf_list.x) ) );
+                if (rot_x !== 0 || rkf_list.x.length > 0) rotateX(radians(rot_x));
             } 
             else if (rkf_list.mode[i] == 'Y') {
-                if (rkf_list.y.length > 0) rotateY( radians( animate_kfs(time_current, rkf_list.y) ) );
+                if (rot_y !== 0 || rkf_list.y.length > 0) rotateY(radians(rot_y));
             }
             else if (rkf_list.mode[i] == 'Z') {
-                if (rkf_list.z.length > 0) rotateZ( radians( animate_kfs(time_current, rkf_list.z) ) );
+                if (rot_z !== 0 || rkf_list.z.length > 0) rotateZ(radians(rot_z));
             }
         }
     }
@@ -297,7 +324,7 @@ class Puppet {
         push();
 
         // ROTATIONS OF FULL_BODY WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.full_body_rot_kfs);
+        this.#applyRotation(time_current,this.full_body_rot_kfs, 'full_body');
 
         
         // -------------------- Legs Start --------------------
@@ -308,20 +335,20 @@ class Puppet {
         // Upper Leg
         translate(50, 250, 0);
         // ROTATIONS OF hips_leg_R WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.hips_leg_r_rot_kfs);
+        this.#applyRotation(time_current,this.hips_leg_r_rot_kfs, 'hips_leg_r');
         this.#drawPart(upper_leg_shape, 'upper_leg_r');
 
         // Lower Leg
         translate(0, height_upper_leg, 0);
         // ROTATIONS OF KNEE_R WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.knee_r_rot_kfs);
+        this.#applyRotation(time_current,this.knee_r_rot_kfs, 'knee_r');
         this.#drawPart(lower_leg_shape, 'lower_leg_r');
 
         // Foot
         translate(0, height_lower_leg + radius_lower_leg, 0);
         // ROTATIONS OF ANKLE_R WILL BE PLACED HERE
         translate(0, -30, 10)
-        this.#applyRotation(time_current,this.ankle_r_rot_kfs);
+        this.#applyRotation(time_current,this.ankle_r_rot_kfs, 'ankle_r');
         translate(0, 30, -10)
         this.#drawPart(foot_shape, 'foot_r');
 
@@ -334,20 +361,20 @@ class Puppet {
         // Upper Leg
         translate(-50, 250, 0);
         // ROTATIONS OF hips_leg_L WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.hips_leg_l_rot_kfs);
+        this.#applyRotation(time_current,this.hips_leg_l_rot_kfs, 'hips_leg_l');
         this.#drawPart(upper_leg_shape, 'upper_leg_l');
 
         // Lower Leg
         translate(0, height_upper_leg, 0);
         // ROTATIONS OF KNEE_L WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.knee_l_rot_kfs);
+        this.#applyRotation(time_current,this.knee_l_rot_kfs, 'knee_l');
         this.#drawPart(lower_leg_shape, 'lower_leg_l');
 
         // Foot
         translate(0, height_lower_leg + radius_lower_leg, 0);
         // ROTATIONS OF ANKLE_L WILL BE PLACED HERE
         translate(0, -30, 10)
-        this.#applyRotation(time_current,this.ankle_l_rot_kfs);
+        this.#applyRotation(time_current,this.ankle_l_rot_kfs, 'ankle_l');
         translate(0, 30, -10)
         this.#drawPart(foot_shape, 'foot_l');
 
@@ -358,13 +385,13 @@ class Puppet {
 
         translate(0, 220, 0);
         // ROTATIONS OF HIPS WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.hips_rot_kfs);
+        this.#applyRotation(time_current,this.hips_rot_kfs, 'hips');
         translate(0, -220, 0);
 
         // -------------------- Head Start --------------------
         push();
         // ROTATIONS OF NECK WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.neck_rot_kfs);
+        this.#applyRotation(time_current,this.neck_rot_kfs, 'neck');
         // -------------------- AI GENERATED NOW START --------------------
         // Use our new function to grab the absolute position!
         global_head_pos = getGlobalPosition();
@@ -397,14 +424,14 @@ class Puppet {
         translate(shoulder_r_pos);
         // rotateZ(radians(-30)); // REMOVE LATER
         // ROTATIONS OF SHOULDER_R WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.shoulder_r_rot_kfs);
+        this.#applyRotation(time_current,this.shoulder_r_rot_kfs, 'shoulder_r');
         this.#drawPart(upper_arm_shape, 'upper_arm_r');
         
 
         // Lower Arm ------------------------------
         translate(0, height_upper_arm, 0); // place at the end of upper arm
         // ROTATIONS OF ELBOW_R WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.elbow_r_rot_kfs);
+        this.#applyRotation(time_current,this.elbow_r_rot_kfs, 'elbow_r');
 
         // Get the global position of a part of the lower arm to allow a string to be tied to it (in scene 02)
         push();
@@ -429,14 +456,14 @@ class Puppet {
         translate(shoulder_l_pos);
         // rotateZ(radians(30)); // REMOVE LATER
         // ROTATIONS OF SHOULDER_L WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.shoulder_l_rot_kfs);
+        this.#applyRotation(time_current,this.shoulder_l_rot_kfs, 'shoulder_l');
         this.#drawPart(upper_arm_shape, 'upper_arm_l');
         
         
         // Lower Arm ------------------------------
         translate(0, height_upper_arm, 0); // place at the end of upper arm
         // ROTATIONS OF ELBOW_L WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.elbow_l_rot_kfs);        
+        this.#applyRotation(time_current,this.elbow_l_rot_kfs, 'elbow_l');        
         this.#drawPart(lower_arm_shape, 'lower_arm_l');
         
 

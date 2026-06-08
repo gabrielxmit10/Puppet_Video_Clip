@@ -14,7 +14,7 @@ class Scene {
      * @returns {boolean}
      */
     isActive(frame_current) {
-        return frame_current >= this.start_frame && frame_current < this.end_frame;
+        return frame_current >= this.start_frame && frame_current <= this.end_frame;
     }
 
     /**

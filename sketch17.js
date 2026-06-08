@@ -227,7 +227,7 @@ function findTimeCurrent() {
 let global_head_pos;
 let global_finger_pos;
 
-function getGlobalPosition() {
+function getGlobalPosition() { // returns vector of the global position of the current local origin after all the transformations applied to it
 	// Steal the current world matrix directly from the p5 renderer
 	let m = _renderer.uModelMatrix.mat4;
 	// The 12th, 13th, and 14th values hold the exact absolute X, Y, and Z
@@ -238,7 +238,7 @@ function getGlobalPosition() {
 
 
 // ---------------------------------------- GLOBAL VARIABLES ----------------------------------------
-let canvas_width = 600; let canvas_height = 600;
+let canvas_width = 800; let canvas_height = 600;
 let keyframe_version = 24; // This represents the unit of frames we use in our keyframe list
 let framerate = 24; // This represents the framerate of our animation
 let editor_mode = 'editor';
@@ -250,7 +250,7 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
-let [ frame_start, frame_end ] = [ 0 , 120 ]; // has the same unit as the keyframe_version variable
+let [ frame_start, frame_end ] = [ 150 , 350 ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
@@ -269,9 +269,18 @@ function setup() {
 
 	// Create Each Scene and add it to the scenes list
 	scenes_list.push(new Scene_01_Dismantled(51, 94));
+	scenes_list.push(new Scene_02_Play(94, 215));
+	scenes_list.push(new Scene_03_Strumming(215, 290));
 
-	// camera(1532, -17, 93, 33, -1, 81)
-	// camera(-1751, -2875, -3289, 80, 10, 45)
+	// camera(1532, -17, 93, 33, -1, 81);
+	// camera(-1751, -2875, -3289, 80, 10, 45);
+	camera(2018, 0, 0, 0, 0, 0);
+	camera(1988, -344, 0, 0, 0, 0);
+	// camera(1706, -1072, 104, 0, 0, 0);
+	// camera(1292, 0, 0, 0, 0, 0);
+	// camera(720, -1023, 322, 0, 0, 0);
+	// camera(2018, 76, 225, 0, 76, 225);
+	// camera(334, -901, 1036, -56, -598, -344);
 
 	
 
@@ -288,6 +297,20 @@ function draw() {
 	initialText();
 	// figure time_current based on song, editor mode, and framerate
 	time_current = findTimeCurrent();
+	
+	
+	// Run Scenes ----------------------
+	// We loop backwards! That way, if you are exactly on a boundary frame (like exactly frame 94), 
+	// it will prioritize the newer scene and BREAK, preventing them from drawing on top of each other and glitching!
+	for (let i = scenes_list.length - 1; i >= 0; i--) {
+		let scene = scenes_list[i];
+		if (scene.isActive(time_current * keyframe_version)) {
+			// push();
+			scene.display(time_current);
+			// pop();
+			break; 
+		}
+	}
 	// code for debugging (axes, plane)
 	if (typeof debug_axes !== 'undefined' && debug_axes) {
 		push();
@@ -298,6 +321,22 @@ function draw() {
 		line(0, 0, 0, 0, 500, 0);
 		stroke(0, 0, 255);
 		line(0, 0, 0, 0, 0, 500);
+
+		// Draw numbers
+		if (typeof fontBeforeStart !== 'undefined') {
+			textFont(fontBeforeStart);
+			textSize(16);
+			textAlign(CENTER, CENTER);
+			noStroke();
+			for (let i = 100; i <= 500; i += 100) {
+				// X axis
+				push(); translate(i, 0, 0); fill(255, 150, 150); text(i, 0, -15); pop();
+				// Y axis
+				push(); translate(0, i, 0); fill(150, 255, 150); text(i, -25, 0); pop();
+				// Z axis
+				push(); translate(0, 0, i); fill(150, 150, 255); text(i, 0, -15); pop();
+			}
+		}
 		pop();
 		stroke(0,0,0);
 
@@ -305,18 +344,12 @@ function draw() {
 		translate(0, 3, 0);
 		rotateX(PI/2);
 		noStroke();
-		// fill(60);
-		plane(4000);
+		fill("rgba(255,255,255,0.5)");
+		// plane(4000);
 		pop();
 	}
-	
 
-	// Run Scenes ----------------------
-	for (let scene of scenes_list) {
-		if (scene.isActive(time_current * keyframe_version)) {
-			scene.display(time_current);
-		}
-	}
+	
 
 
 	// ------------------------------ AI GENERATED START: OrbitControl Camera Info UI ------------------------------

@@ -8,6 +8,11 @@
 class Hand {
 	// Guide of use (methods):
 	// - TBD (CHANGE LATER - continue writing)
+	// - addRotationX(s, kf) to add a keyframe for rotation in X axis (same for Y and Z)
+	//		- For X and Z you can also refer to a finger as a whole (like "pinky") and give an array with 3 values and each value will be the X/Z rotation each joint of that finger, from bottom to top ( like "index0", "index1", "index2")
+    // - addRotation(s, kf) to add a keyframe for rotation in all axes at once (kf.value needs to be an array of 3 values for each axis)
+    // - changeRotationMode(s, mode) to change the order of rotation for a specific joint (s) with the mode string (like "YZX")
+    // - display(time_current) to display the hand
 
 
 	constructor() {
@@ -48,6 +53,15 @@ class Hand {
 			'thumb0': this.finger_rot_kfs.thumb[0],
 			'thumb1': this.finger_rot_kfs.thumb[1],
 			'thumb2': this.finger_rot_kfs.thumb[2]
+		};
+
+		// Map for fingers overall (used to rotate all joints in a finger at once in one of the addRotation functions)
+		this.finger_rot_kfs_overall_map = {
+			'pinky': this.finger_rot_kfs.pinky,
+			'ring': this.finger_rot_kfs.ring,
+			'middle': this.finger_rot_kfs.middle,
+			'index': this.finger_rot_kfs.index,
+			'thumb': this.finger_rot_kfs.thumb
 		};
 
 	}
@@ -111,6 +125,15 @@ class Hand {
             this.#pushKeyFrame(kf, this.main_rot_kfs_map[s].x);
         } else if (this.finger_rot_kfs_map[s]) {
 			this.#pushKeyFrame(kf, this.finger_rot_kfs_map[s].x);
+		} else if (this.finger_rot_kfs_overall_map[s]) { // if the user is trying to add a rotation to all sections of a finger at once
+			for (let i = 0; i < 3; i++) {
+				// keyframe values go to each joint of the finger 
+				// (ex: if value is [10,20,30], the first joint will get 10, the second 20 and the third 30 in the X axis)
+				let kf_x = new KeyFrame(kf.time, kf.value[i], kf.type_of_lerp, kf.velocity);
+				this.#pushKeyFrame(kf_x, this.finger_rot_kfs_overall_map[s][i].x);
+			}
+		} else { // throw error
+			throw new Error('Joint ' + s + ' does not have addRotationX()');
 		}
     }
 	/**
@@ -132,6 +155,13 @@ class Hand {
             this.#pushKeyFrame(kf, this.main_rot_kfs_map[s].z);
         } else if (this.finger_rot_kfs_map[s]) {
 			this.#pushKeyFrame(kf, this.finger_rot_kfs_map[s].z);
+		} else if (this.finger_rot_kfs_overall_map[s]) { // if the user is trying to add a rotation to all sections of a finger at once
+			// keyframe values go to each joint of the finger 
+			// (ex: if value is [10,20,30], the first joint will get 10, the second 20 and the third 30 in the z axis)
+			let kf_z = new KeyFrame(kf.time, kf.value[i], kf.type_of_lerp, kf.velocity);
+			this.#pushKeyFrame(kf_z, this.finger_rot_kfs_overall_map[s][i].z);
+		} else { // throw error
+			throw new Error('Joint ' + s + ' does not have addRotationZ()');
 		}
     }
 	/**
@@ -143,9 +173,9 @@ class Hand {
             let kf_x = new KeyFrame(kf.time, kf.value[0], kf.type_of_lerp, kf.velocity);
             let kf_y = new KeyFrame(kf.time, kf.value[1], kf.type_of_lerp, kf.velocity);
             let kf_z = new KeyFrame(kf.time, kf.value[2], kf.type_of_lerp, kf.velocity);
-            this.#pushKeyFrame(kf_x, this.rot_kfs_map[s].x);
-            this.#pushKeyFrame(kf_y, this.rot_kfs_map[s].y);
-            this.#pushKeyFrame(kf_z, this.rot_kfs_map[s].z);
+            this.#pushKeyFrame(kf_x, this.main_rot_kfs_map[s].x);
+            this.#pushKeyFrame(kf_y, this.main_rot_kfs_map[s].y);
+            this.#pushKeyFrame(kf_z, this.main_rot_kfs_map[s].z);
         } else if (this.finger_rot_kfs_map[s]) {
 			// create keyframe of each
 			let kf_x = new KeyFrame(kf.time, kf.value[0], kf.type_of_lerp, kf.velocity);

@@ -22,6 +22,12 @@ class RotationKeyFrameList {
 
 }
 
+class TranslationKeyFrameList {
+    constructor() {
+        this.x = []; this.y = []; this.z = []; // each is a list of keyframes for a specific translation on the specific axis
+    }
+}
+
 /**
  * @typedef {"constant"|"linear"|"easeIn"|"easeOut"|"easeInOut"|"easeInOutBezier"|"easeInOutHermite"|"hermite"|"bezierSimple"} InterpolationType
  */
@@ -255,6 +261,40 @@ function interpolate_values(value1, value2, t_new) { // handles the structure of
 
     // Handle single numbers
     return lerp(value1, value2, t_new);
+}
+
+function noise_func(time_current, amplitude, frequency) {
+    // time_current can be a number or an array of numbers, and the function will return the noise for each of them based on the amplitude and frequency given (which can also be single numbers or arrays of the same length as time_current)
+    noiseSeed(99); // set a fixed seed for consistent noise
+    if (Array.isArray(time_current)) {
+        let result = [];
+        for (let i = 0; i < time_current.length; i++) {
+            result[i] = noise_func(time_current[i], amplitude[i], frequency[i]);
+        }
+        return result;
+    } else {
+        return (noise(time_current * frequency) - 0.5) * 2 * amplitude; // noise between -amplitude and +amplitude
+    }
+}
+
+function noise_func_to_value(value, time_current, amplitude, frequency) {
+    // value can be a vector, array, or number and time_current has to be the same type as value (so each time_current[i] applies to value[i])
+    // amplitude and frequency have to be lists of the same length as value or single numbers if the value is a single number
+    if (value instanceof p5.Vector) {
+        return createVector(
+            value.x + noise_func(time_current.x, amplitude[0], frequency[0]),
+            value.y + noise_func(time_current.y, amplitude[1], frequency[1]),
+            value.z + noise_func(time_current.z, amplitude[2], frequency[2])
+        );
+    } else if (Array.isArray(value)) { // returns array if != 3, else vector
+        let result = [];
+        for (let i = 0; i < value.length; i++) {
+            result[i] = value[i] + noise_func(time_current[i], amplitude[i], frequency[i]);
+        }
+        return result.length != 3 ? result : createVector(...result);
+    } else { // single number
+        return value + noise_func(time_current, amplitude, frequency);
+    }
 }
 
 

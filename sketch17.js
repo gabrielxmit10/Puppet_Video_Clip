@@ -240,7 +240,7 @@ function getGlobalPosition() { // returns vector of the global position of the c
 // ---------------------------------------- GLOBAL VARIABLES ----------------------------------------
 let canvas_width = 800; let canvas_height = 600;
 let keyframe_version = 24; // This represents the unit of frames we use in our keyframe list
-let framerate = 24; // This represents the framerate of our animation
+let framerate = 60; // This represents the framerate of our animation
 let editor_mode = 'editor';
 // 'animation' or '' - runs the animation
 // 'fixed' - fixes the animation at a frame frame_start
@@ -250,7 +250,7 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
-let [ frame_start, frame_end ] = [ 215 , 450 ]; // has the same unit as the keyframe_version variable
+let [ frame_start, frame_end ] = [ 425 , 550 ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
@@ -271,12 +271,16 @@ function setup() {
 	scenes_list.push(new Scene_01_Dismantled(51, 94));
 	scenes_list.push(new Scene_02_Play(94, 215));
 	scenes_list.push(new Scene_03_Strumming(215, 290));
-	scenes_list.push(new Scene_04_Spin(290, 425));
+	scenes_list.push(new Scene_04_Spin(290, 420));
+	scenes_list.push(new Scene_05_Theater(420, 596));
 
 	// camera(1532, -17, 93, 33, -1, 81);
 	// camera(-1751, -2875, -3289, 80, 10, 45);
 	camera(2018, 0, 0, 0, 0, 0);
-	camera(0, 44, 2351, 0, 0, 0);
+	camera(-68, -922, 4871, -9, -652, 12);
+	camera(-1, -796, -134, -1, -711, -29);
+	camera(-112, -767, -82, -1, -711, -29);
+	camera(-1366, -1184, 4419, -50, -647, 100);
 	// camera(1706, -1072, 104, 0, 0, 0);
 	// camera(1292, 0, 0, 0, 0, 0);
 	// camera(720, -1023, 322, 0, 0, 0);

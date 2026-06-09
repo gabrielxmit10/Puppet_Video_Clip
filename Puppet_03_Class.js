@@ -98,6 +98,7 @@ class Puppet {
 
         // Global positions of certain parts for specifc uses in animation
         this.global_string_pos_lower_arm_r; // position to allow a string to be tied to the arm
+        this.global_string_pos_lower_arm_l; // position to allow a string to be tied to the arm
     }
 
     /**
@@ -435,9 +436,9 @@ class Puppet {
 
         // Get the global position of a part of the lower arm to allow a string to be tied to it (in scene 02)
         push();
-            translate(0, height_lower_arm-radius_hand-20, 0); // translate to right above the hand and to the side of the arm
+            translate(0, height_lower_arm-radius_hand-20, 0); // translate to right above the hand
             this.global_string_pos_lower_arm_r = getGlobalPosition(); // Get the global position
-            console.log("Global position of lower arm for string: ", this.global_lower_arm_r_string_pos); // REMOVE LATER - just for checking the position is correct in the console
+            // console.log("Global position of lower arm for string: ", this.global_lower_arm_r_string_pos); // REMOVE LATER - just for checking the position is correct in the console
         pop();
 
         this.#drawPart(lower_arm_shape, 'lower_arm_r');
@@ -463,7 +464,15 @@ class Puppet {
         // Lower Arm ------------------------------
         translate(0, height_upper_arm, 0); // place at the end of upper arm
         // ROTATIONS OF ELBOW_L WILL BE PLACED HERE
-        this.#applyRotation(time_current,this.elbow_l_rot_kfs, 'elbow_l');        
+        this.#applyRotation(time_current,this.elbow_l_rot_kfs, 'elbow_l');   
+        
+        // Get the global position of a part of the lower arm to allow a string to be tied to it (in scene 02)
+        push();
+            translate(0, height_lower_arm-radius_hand-20, 0); // translate to right above the hand
+            this.global_string_pos_lower_arm_l = getGlobalPosition(); // Get the global position
+            // console.log("Global position of lower arm for string: ", this.global_lower_arm_r_string_pos); // REMOVE LATER - just for checking the position is correct in the console
+        pop();
+        
         this.#drawPart(lower_arm_shape, 'lower_arm_l');
         
 

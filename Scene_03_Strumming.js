@@ -218,6 +218,9 @@ class Scene_03_Strumming extends Scene {
         // this.camera_kf_list.push(new KeyFrame(215, [1988, 0, 0, 0, 0, 0], 'linear'));
         this.camera_kf_list.push(new KeyFrame(215, [1800, -200, 300, 0, 0, 300], 'linear'));
         this.camera_kf_list.push(new KeyFrame(290, [1800, 200, -100, 0, 0, -100], 'easeInOut'));
+        
+
+        
     }
 
     display(time_current) {
@@ -229,8 +232,16 @@ class Scene_03_Strumming extends Scene {
 
         // Display objects ----------------------
 
+
+
         push();
-            translate(animate_kfs(time_current, this.hand_translate_kf_list));
+            // adding a bit of vertical noise to the hand translation to make it look more natural
+            let animate_hand_translate = animate_kfs(time_current, this.hand_translate_kf_list);
+            let times = createVector(0, time_current, 0);
+            let amplitude = [0,200,0]; let frequency = [0,0.3,0];
+
+            animate_hand_translate = noise_func_to_value(animate_hand_translate, times, amplitude, frequency);
+            translate(animate_hand_translate);
             scale(1, -1, 1);
             this.hand.display(time_current);
         pop();

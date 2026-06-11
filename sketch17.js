@@ -13,7 +13,7 @@ let editor_slider;
 let editor_input;
 let is_playing = false;
 let btn_play;
-let editor_step = 1;
+let editor_step = 6;
 let cam_info_input;
 function updateEditorUI() {
 	if (editor_slider && editor_input) {
@@ -250,7 +250,7 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
-let [ frame_start, frame_end ] = [ 425 , 550 ]; // has the same unit as the keyframe_version variable
+let [ frame_start, frame_end ] = [ 0 , 1000 ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
@@ -265,29 +265,30 @@ function setup() {
 
 	initPuppetVariables(); initPuppetGeometries(); // initializes the variables and geometries for the puppet
 	initHandVariablesAndGeometries(); // initializes the variables and geometries for the hand
+	initStageVariables();
 	setupEditorUI();
 
 	// Create Each Scene and add it to the scenes list
 	scenes_list.push(new Scene_01_Dismantled(51, 94));
 	scenes_list.push(new Scene_02_Play(94, 215));
 	scenes_list.push(new Scene_03_Strumming(215, 290));
-	scenes_list.push(new Scene_04_Spin(290, 420));
-	scenes_list.push(new Scene_05_Theater(420, 596));
+	scenes_list.push(new Scene_04_Spin(290, 410));
+	scenes_list.push(new Scene_05_Theater(410, 596));
+	scenes_list.push(new Scene_06_Around(596, 680));
 
 	// camera(1532, -17, 93, 33, -1, 81);
 	// camera(-1751, -2875, -3289, 80, 10, 45);
-	camera(2018, 0, 0, 0, 0, 0);
-	camera(-68, -922, 4871, -9, -652, 12);
-	camera(-1, -796, -134, -1, -711, -29);
-	camera(-112, -767, -82, -1, -711, -29);
-	camera(-1366, -1184, 4419, -50, -647, 100);
-	// camera(1706, -1072, 104, 0, 0, 0);
-	// camera(1292, 0, 0, 0, 0, 0);
-	// camera(720, -1023, 322, 0, 0, 0);
-	// camera(2018, 76, 225, 0, 76, 225);
-	// camera(334, -901, 1036, -56, -598, -344);
 
+
+	camera(265, -519, 267, 148, -20, 299);
+	camera(222, -349, 140, 39, 733, 274);
+	camera(207, -362, 252, 73, 732, 335);
+	camera(143, -370, 288, 73, 732, 335);
+	camera(149, -464, 284, 73, 732, 335);
 	
+	
+	camera(158, -1712, 294, 73, 732, 335);
+	// camera(1193, 752, 103, 374, 1044, 254);
 
 }
 

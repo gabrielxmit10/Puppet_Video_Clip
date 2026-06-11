@@ -11,7 +11,8 @@ class RotationKeyFrameList {
     constructor( mode = 'XYZ' ) {
         
         this.x = []; this.y = []; this.z = []; // each is a list of keyframes for a specific rotation around the specific axis
-        this.mode = mode; // This will determine the order of rotations
+        this.mode = mode; // This will determine the default order of rotations
+        this.mode_kfs = []; // A list of keyframes to dynamically change the rotation mode
 
         // mode will apply rotations based on the order of the letters
         //      - Its possible values are all combinations of X, Y and Z: XYZ, XZY, YXZ, YZX, ZXY, ZYX
@@ -160,6 +161,36 @@ function animate_kfs(time_current, kf_list) { // takes the current time in secon
 
 }
 
+class Shot {
+    // each shot is a list of kfs and a starting frame, and it will be active from its start frame to the next shot's start frame
+    // it represents that at start_frame, the kf_list will turn active and will keep its keyframes until the next shot's start_frame
+    constructor(start_frame, kf_list) {
+        this.start_frame = start_frame;
+        this.kf_list = kf_list;
+    }
+}
+
+function animate_shots(time_current, shots_list) { // takes the current time and a list of shots [{start_frame: 0, kf_list: []}, ...] and returns the interpolated value for the active shot
+    if (!shots_list || shots_list.length === 0) return null;
+    
+    let frame_current = time_current * keyframe_version;
+    let active_kf_list = shots_list[0].kf_list;
+
+    // Find the shot that should be active at the current frame 
+    // (the shots dont need to be in order, but the shot chosen will be the one that is the one with largest start_frame that is less than frame_current)
+    for (let i = 0; i < shots_list.length; i++) {
+        if (frame_current >= shots_list[i].start_frame) {
+            active_kf_list = shots_list[i].kf_list;
+        } 
+        // else {
+        //     break; // Shots should be added in chronological order
+        // }
+    }
+
+    // Reuse the existing animation logic on the active shot
+    return animate_kfs(time_current, active_kf_list);
+}
+
 function kf_lerp(kf1, kf2, t, type_of_lerp) { // takes keyframes and the t between them and returns the interpolated value
     // if (type_of_lerp === "constant") return kf1.value;
 
@@ -172,7 +203,7 @@ function kf_lerp(kf1, kf2, t, type_of_lerp) { // takes keyframes and the t betwe
 
 function calculate_easing_t(kf1, kf2, t, type_of_lerp) {
     // This function purely handles the math of warping time (t -> t_new)
-    if (type_of_lerp === "constant") return 0; // at the beggining of the interval
+    if (type_of_lerp === "constant") return t >= 1 ? 1 : 0; // Snap exactly at the next keyframe
     if (type_of_lerp === "linear") return t;
     if (type_of_lerp === "easeIn") return t * t;
     if (type_of_lerp === "easeOut") return 1 - (1 - t) * (1 - t);
@@ -245,6 +276,11 @@ function interpolate_bezierSimple(t, x0, y0, x1, y1) { // interpolates from 0 to
 
 function interpolate_values(value1, value2, t_new) { // handles the structure of the data (p5.Vector, Array, or Number)
     
+    // Handle strings
+    if (typeof value1 === 'string') {
+        return t_new < 1 ? value1 : value2;
+    }
+
     // Handle p5.Vector
     if (value1 instanceof p5.Vector && value2 instanceof p5.Vector) {
         return p5.Vector.lerp(value1, value2, t_new);
@@ -254,7 +290,11 @@ function interpolate_values(value1, value2, t_new) { // handles the structure of
     if (Array.isArray(value1) && Array.isArray(value2)) {
         let result = [];
         for (let i = 0; i < value1.length; i++) {
-            result[i] = lerp(value1[i], value2[i], t_new);
+            if (typeof value1[i] === 'string') {
+                result[i] = t_new < 1 ? value1[i] : value2[i];
+            } else {
+                result[i] = lerp(value1[i], value2[i], t_new);
+            }
         }
         return result.length > 3 ? result : createVector(...result);
     }
@@ -296,5 +336,12 @@ function noise_func_to_value(value, time_current, amplitude, frequency) {
         return value + noise_func(time_current, amplitude, frequency);
     }
 }
+
+function stepDouble(t, start, end) { // returns 1 when t in [start, end)], else 0
+    if (t >= start && t < end) {
+        return 1;
+    } else return 0;
+}
+
 
 

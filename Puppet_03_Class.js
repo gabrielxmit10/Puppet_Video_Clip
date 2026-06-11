@@ -9,10 +9,11 @@ class Puppet {
     //      - addRotationX(s, kf) to add a keyframe for rotation in X axis (same for Y and Z)
     //      - addRotation(s, kf) to add a keyframe for rotation in all axes at once (kf.value needs to be an array of 3 values for each axis)
     //      - changeRotationMode(s, mode) to change the order of rotation for a specific joint (s) with the mode string (like "YZX")
-    //      - display(time_current) to display the puppet
+    //      - addRotationMode(s, kf) to add a keyframe for rotation mode for a specific joint (s) with the mode string (like "YZX") ( to use do like this.addRotationMode('neck', new KeyFrame(0, 'YZX')) )
     //      - hidePart(b) and showPart(b) to hide/show specific body parts of the puppet
     //      - hideAll() and showAll() to hide/show all body parts of the puppet
     //      - hideExcept(b) to hide all body parts except b (b can be the name of a body part)
+    //      - display(time_current) to display the puppet
 
     // The names (s) of joints are:
     //      - Body: 
@@ -38,6 +39,8 @@ class Puppet {
 
         // Each rotation property will have a list of Keyframes that will have a mode
         this.full_body_rot_kfs = new RotationKeyFrameList();
+        
+        this.full_body_trans_kfs = new TranslationKeyFrameList();
 
             this.hips_rot_kfs = new RotationKeyFrameList();
 
@@ -74,10 +77,15 @@ class Puppet {
             'neck': this.neck_rot_kfs,
         };
 
+        this.trans_kfs_map = {
+            'full_body': this.full_body_trans_kfs,
+        };
+
         // Procedural animations map
         this.procedural_functions = {};
 
         // Visibility map for body parts
+        this.visibility_kfs_map = {}; // Maps body parts to an array of visibility keyframes (0 for hide, 1 for show)
         this.show_map = {
             // you can also hide groups like "arm_r" or "leg_l"
             'upper_leg_r': true,
@@ -111,6 +119,18 @@ class Puppet {
         }
         else { // throw error
             throw new Error('Joint ' + s + ' not found in changeRotationMode()');
+        }
+    }
+
+    /**
+     * @param {JointsNamesPuppet} s
+     */
+    addRotationMode(s, kf) {
+        if (this.rot_kfs_map[s]) {
+            kf.type_of_lerp = 'constant'; // Rotation modes should change instantaneously
+            this.#pushKeyFrame(kf, this.rot_kfs_map[s].mode_kfs);
+        } else {
+            throw new Error('Joint ' + s + ' not found in addRotationMode()');
         }
     }
 
@@ -150,7 +170,13 @@ class Puppet {
         // -------------------- AI GENERATED END --------------------
     }
 
-    
+    resetAllRotations(frame_number, type_of_lerp = 'constant') { // turns all rotations into [0,0,0] by adding kfs to each parts kf lists at frame_number
+        for (let s in this.rot_kfs_map) {
+            this.addRotationX(s, new KeyFrame(frame_number, 0, type_of_lerp));
+            this.addRotationY(s, new KeyFrame(frame_number, 0, type_of_lerp));
+            this.addRotationZ(s, new KeyFrame(frame_number, 0, type_of_lerp));
+        }
+    }
 
     /**
      * @param {JointsNamesPuppet} s
@@ -191,6 +217,32 @@ class Puppet {
         }
     }
 
+    addTranslationX(s, kf) { 
+        if (this.trans_kfs_map[s]) {
+            this.#pushKeyFrame(kf, this.trans_kfs_map[s].x);
+        }
+    }
+    addTranslationY(s, kf) { 
+        if (this.trans_kfs_map[s]) {
+            this.#pushKeyFrame(kf, this.trans_kfs_map[s].y);
+        }
+    }
+    addTranslationZ(s, kf) { 
+        if (this.trans_kfs_map[s]) {
+            this.#pushKeyFrame(kf, this.trans_kfs_map[s].z);
+        }
+    }
+    addTranslation(s, kf) { 
+        if (this.trans_kfs_map[s]) {
+            let kf_x = new KeyFrame(kf.time, kf.value[0], kf.type_of_lerp, kf.velocity);
+            let kf_y = new KeyFrame(kf.time, kf.value[1], kf.type_of_lerp, kf.velocity);
+            let kf_z = new KeyFrame(kf.time, kf.value[2], kf.type_of_lerp, kf.velocity);
+            this.#pushKeyFrame(kf_x, this.trans_kfs_map[s].x);
+            this.#pushKeyFrame(kf_y, this.trans_kfs_map[s].y);
+            this.#pushKeyFrame(kf_z, this.trans_kfs_map[s].z);
+        }
+    }
+
     /**
      * @param {JointsNamesPuppet} s
      * @param {Function} func - function(time_current, [kf_x, kf_y, kf_z]) => [new_x, new_y, new_z]
@@ -201,6 +253,47 @@ class Puppet {
         } else { // else it throws an error
             throw new Error('Joint ' + s + ' not found for addProcedural()');
         }
+    }
+
+    /**
+     * @param {PuppetBodyPartsNames} b
+     */
+    addVisibility(b, kf) {
+        if (!this.visibility_kfs_map[b]) {
+            this.visibility_kfs_map[b] = [];
+        }
+        kf.type_of_lerp = 'constant'; // Visibility transitions should be instantaneous
+        this.#pushKeyFrame(kf, this.visibility_kfs_map[b]);
+    }
+
+    #applyVisibility(time_current) {
+        for (let b in this.visibility_kfs_map) {
+            let kf_list = this.visibility_kfs_map[b];
+            if (kf_list.length > 0) {
+                let val = animate_kfs(time_current, kf_list);
+                if (val > 0.5) {
+                    this.showPart(b);
+                } else {
+                    this.hidePart(b);
+                }
+            }
+        }
+    }
+
+    #applyTranslation(time_current, tkf_list, joint_name = null) { 
+        let trans_x = tkf_list.x.length > 0 ? animate_kfs(time_current, tkf_list.x) : 0;
+        let trans_y = tkf_list.y.length > 0 ? animate_kfs(time_current, tkf_list.y) : 0;
+        let trans_z = tkf_list.z.length > 0 ? animate_kfs(time_current, tkf_list.z) : 0;
+
+        // If a procedural function exists, let it modify translations too
+        if (joint_name && this.procedural_functions[joint_name]) {
+            let result = this.procedural_functions[joint_name](time_current, [trans_x, trans_y, trans_z]);
+            trans_x = result[0];
+            trans_y = result[1];
+            trans_z = result[2];
+        }
+
+        translate(trans_x, trans_y, trans_z);
     }
 
     #applyRotation(time_current, rkf_list, joint_name = null){ // takes a list of rotation keyframes and applies the correct rotation for the current time, interpolating (animate_kfs) and applying procedural functions (if they exist)
@@ -218,15 +311,21 @@ class Puppet {
             rot_z = result[2];
         }
 
+        // Determine the current rotation mode (overwrite with keyframes if they exist)
+        let current_mode = rkf_list.mode;
+        if (rkf_list.mode_kfs && rkf_list.mode_kfs.length > 0) {
+            current_mode = animate_kfs(time_current, rkf_list.mode_kfs);
+        }
+
         // 3. Apply the rotations in the correct order based on the mode
-        for (let i = 0; i < rkf_list.mode.length; i++) { 
-            if (rkf_list.mode[i] == 'X') {
+        for (let i = 0; i < current_mode.length; i++) { 
+            if (current_mode[i] == 'X') {
                 if (rot_x !== 0 || rkf_list.x.length > 0) rotateX(radians(rot_x));
             } 
-            else if (rkf_list.mode[i] == 'Y') {
+            else if (current_mode[i] == 'Y') {
                 if (rot_y !== 0 || rkf_list.y.length > 0) rotateY(radians(rot_y));
             }
-            else if (rkf_list.mode[i] == 'Z') {
+            else if (current_mode[i] == 'Z') {
                 if (rot_z !== 0 || rkf_list.z.length > 0) rotateZ(radians(rot_z));
             }
         }
@@ -234,8 +333,18 @@ class Puppet {
 
     #drawPart(shape, s) { // tests if the shape is not null and if the part should be shown
         if (this.show_map[s]) { 
-            // if 
             model(shape);
+        } else {
+            // -------------------- AI GENERATED START --------------------
+            // "Warm up" the GPU: draw the part microscopically small so WebGL 
+            // caches the textures and geometries, preventing lag spikes later!
+            // (the lag I had here was in scene_05_theater when the camera changed and the head had to be loaded again)
+            
+            push();
+            scale(0.0001);
+            model(shape);
+            pop();
+            // -------------------- AI GENERATED END --------------------
         }
     }
 
@@ -323,6 +432,12 @@ class Puppet {
 
     display( time_current = 0 ) { 
         push();
+
+        // Apply visibility keyframes
+        this.#applyVisibility(time_current);
+
+        // TRANSLATIONS OF FULL_BODY WILL BE PLACED HERE
+        this.#applyTranslation(time_current, this.full_body_trans_kfs, 'full_body');
 
         // ROTATIONS OF FULL_BODY WILL BE PLACED HERE
         this.#applyRotation(time_current,this.full_body_rot_kfs, 'full_body');

@@ -82,11 +82,11 @@ function initPuppetVariables(){
     // Initialize colors
     color_body = color("rgba(128, 128, 128, 1)");
     color_upper_arm = color("rgba(110, 110, 110, 1)");
-    color_lower_arm = color("rgba(110, 110, 110, 1)");
-    color_hand = color("rgba(110, 110, 110, 1)");
-    color_upper_leg = color("rgba(110, 110, 110, 1)");
-    color_lower_leg = color("rgba(110, 110, 110, 1)");
-    color_foot = color("rgba(110, 110, 110, 1)");
+    color_lower_arm = color_upper_arm;
+    color_hand = color_upper_arm;
+    color_upper_leg = color_upper_arm;
+    color_lower_leg = color_upper_arm;
+    color_foot = color_upper_arm;
 
     // Initialize base joint positions
     full_body_pos = createVector(0, 155, 0); // in the middle of the torso, to rotate the whole body around this point

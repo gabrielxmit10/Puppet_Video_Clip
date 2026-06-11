@@ -93,9 +93,9 @@ class Scene_06_Around extends Scene {
         
 
         // camera movement
-        this.camera_kf_list.push(new KeyFrame(596, [121, -647, 312, 73, 732, 335], 'linear'));
-        // this.camera_kf_list.push(new KeyFrame(680-0, [1321, 2054+200, 464, 13, 792+200, 325], 'linear'));
-        this.camera_kf_list.push(new KeyFrame(680, [1688, 996, -32, 369, 980, 225], 'linear'));
+        this.camera_kf_list.push(new KeyFrame(596, [121, -647, 312, 73, 732, 335], 'easeInOut'));
+        this.camera_kf_list.push(new KeyFrame(680-0, [1321, 2054+0, 464, 13, 792+0, 325], 'linear'));
+        // this.camera_kf_list.push(new KeyFrame(680, [1688, 996, -32, 369, 980, 225], 'linear'));
         // this.camera_kf_list.push(new KeyFrame(680, [96, 84, 324, 73, 732, 335], 'linear'));
 
     }
@@ -178,8 +178,8 @@ class Scene_06_Around extends Scene {
             this.hand_layer.end();
 
             // Calculate your alpha using your keyframes (0 to 255)
-            let current_hand_alpha = animate_kfs(time_current, this.hand_opacity_kf_list); 
-            // let current_hand_alpha = 255; 
+            // let current_hand_alpha = animate_kfs(time_current, this.hand_opacity_kf_list); 
+            let current_hand_alpha = 255; 
             
             // reset model matrix to use the default camera (z=800) to display the hand
             resetMatrix();

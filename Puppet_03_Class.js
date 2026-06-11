@@ -105,8 +105,9 @@ class Puppet {
         };
 
         // Global positions of certain parts for specifc uses in animation
-        this.global_string_pos_lower_arm_r; // position to allow a string to be tied to the arm
-        this.global_string_pos_lower_arm_l; // position to allow a string to be tied to the arm
+        this.global_string_pos_lower_arm_r; // position to allow a string to be tied to the lower right arm
+        this.global_string_pos_lower_arm_l; // position to allow a string to be tied to the lower left arm
+        this.global_string_pos_neck; // position to allow a string to be tied to the neck joint
     }
 
     /**
@@ -428,7 +429,29 @@ class Puppet {
         this.showPart(b);
     }
 
-    
+    // ------------------------------ AI GENERATED START ------------------------------
+    getNeckOffset(time_current) {
+        push();
+        resetMatrix(); // Ensure we are calculating the offset from (0,0,0) without any external scene translations
+        
+        // 1. Full Body transformations
+        this.#applyTranslation(time_current, this.full_body_trans_kfs, 'full_body');
+        this.#applyRotation(time_current, this.full_body_rot_kfs, 'full_body');
+
+        // 2. Hips transformations
+        translate(0, 220, 0);
+        this.#applyRotation(time_current, this.hips_rot_kfs, 'hips');
+        translate(0, -220, 0);
+
+        // 3. Neck transformations
+        this.#applyRotation(time_current, this.neck_rot_kfs, 'neck');
+
+        let offset = getGlobalPosition();
+        pop();
+        
+        return offset;
+    }
+    // ------------------------------ AI GENERATED END ------------------------------
 
     display( time_current = 0 ) { 
         push();
@@ -511,6 +534,7 @@ class Puppet {
         // -------------------- AI GENERATED NOW START --------------------
         // Use our new function to grab the absolute position!
         global_head_pos = getGlobalPosition();
+        this.global_string_pos_neck = global_head_pos;  
         // -------------------- AI GENERATED NOW END --------------------
         texture(head_tex);
         this.#drawPart(head_shape, 'head');

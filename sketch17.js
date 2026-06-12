@@ -250,7 +250,7 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
-let [ frame_start, frame_end ] = [ 680 , 762 ]; // has the same unit as the keyframe_version variable
+let [ frame_start, frame_end ] = [ 762 , 950 ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
@@ -276,6 +276,7 @@ function setup() {
 	scenes_list.push(new Scene_05_Theater(410, 596));
 	scenes_list.push(new Scene_06_Around(596, 680));
 	scenes_list.push(new Scene_07_Pulled(680, 762));
+	scenes_list.push(new Scene_08_Clear(762, 850));
 	
 
 	// camera(1532, -17, 93, 33, -1, 81);
@@ -293,11 +294,13 @@ function setup() {
 	// camera(1193, 752, 103, 374, 1044, 254);
 	camera(0,0,800,0,0,0);
 	camera(1927, 90, 2052, -35, 151, 39);
-	camera(1985, -450, 1979, 23, -389, -34);
+	camera(1749, -573, 1928, -39, 30, -64);
+	camera(0, 733, 2267, 0, 0+100, -58);
+	camera(100, -2242, 341, -51, 32, -328);
 	
-	let ang_cam = radians(45); 
-	let raio = 2000; let altura = -600;
-	camera(cos(ang_cam)*raio, 0+altura+1300, sin(ang_cam)*raio,0,altura,0);
+	// let ang_cam = radians(45); 
+	// let raio = 2000; let altura = -600;
+	// camera(cos(ang_cam)*raio, 0+altura+1300, sin(ang_cam)*raio,0,altura,0);
 
 }
 

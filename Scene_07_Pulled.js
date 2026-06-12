@@ -43,7 +43,7 @@ class Scene_07_Pulled extends Scene {
         this.puppet.addRotation('ankle_r', new KeyFrame(680, [-58,0,0]));
         this.puppet.addRotation('ankle_l', new KeyFrame(680, [-58,0,0]));
 
-        let frames_to_pull = [690+20, 705+20, 720+20]; let pull_trans = -300; let pull_back_trans = -100;
+        let frames_to_pull = [707+8, 720+8, 733+8]; let pull_trans = -300; let pull_back_trans = -100;
         for (let i = 0; i < frames_to_pull.length; i++){
             let test_pull_time1 = frames_to_pull[i];
             let test_pull_time2 = test_pull_time1 + 5;

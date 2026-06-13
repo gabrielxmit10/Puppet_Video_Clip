@@ -250,7 +250,7 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
-let [ frame_start, frame_end ] = [ 920 , 1100 ]; // has the same unit as the keyframe_version variable
+let [ frame_start, frame_end ] = [ 1010, 1090  ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
@@ -278,6 +278,8 @@ function setup() {
 	scenes_list.push(new Scene_07_Pulled(680, 762));
 	scenes_list.push(new Scene_08_Clear(762, 850));
 	scenes_list.push(new Scene_09_Puppet_to_You(850, 929));
+	scenes_list.push(new Scene_10_Done(929, 1010));
+	scenes_list.push(new Scene_11_Cut(1010, 1092));
 	// ASK AI to change the folder that i have the puppet and the angles of joints in sliders so that it also allows for changing the order of the rotations for a specific joint
 
 	// OR also the possibility of making that change for multiple joints at a time (so it would have sth to select for each and then id apply the change, itd also be good to have the mode like "yzx" displayed on its side and it should be according to the order that i do it in my program normally)
@@ -294,18 +296,10 @@ function setup() {
 	camera(149, -464, 284, 73, 732, 335);
 	
 	
-	camera(158, -1712, 294, 73, 732, 335);
-	// camera(1193, 752, 103, 374, 1044, 254);
-	camera(0,0,800,0,0,0);
-	camera(1927, 90, 2052, -35, 151, 39);
-	camera(1749, -573, 1928, -39, 30, -64);
-	camera(0, 733, 2267, 0, 0+100, -58);
 	
-	camera(0, 16, 3987, 59, -970, 62);
-	camera(228, -430, 687, 158, -1161, 422);
-	camera(1001, 1097, 3477, 21, -963, 108);
 	
-	camera(2300, 986, 2623, 51, -1023, -108);
+	camera(3095, -600, 2427, -62, 55, -55);
+	camera(0,0,1200,0,0,0);
 	
 }
 
@@ -337,13 +331,13 @@ function draw() {
 	// code for debugging (axes, plane)
 	if (typeof debug_axes !== 'undefined' && debug_axes) {
 		push();
-		strokeWeight(9);
+		strokeWeight(4);
 		stroke(255, 0, 0);
-		line(0, 0, 0, 500, 0, 0);
+		line(0, 0, 0, 900, 0, 0);
 		stroke(0, 255, 0);
-		line(0, 0, 0, 0, 500, 0);
+		line(0, 0, 0, 0, 900, 0);
 		stroke(0, 0, 255);
-		line(0, 0, 0, 0, 0, 500);
+		line(0, 0, 0, 0, 0, 900);
 
 		// Draw numbers
 		if (typeof fontBeforeStart !== 'undefined') {
@@ -351,7 +345,7 @@ function draw() {
 			textSize(16);
 			textAlign(CENTER, CENTER);
 			noStroke();
-			for (let i = 100; i <= 500; i += 100) {
+			for (let i = 100; i <= 900; i += 100) {
 				// X axis
 				push(); translate(i, 0, 0); fill(255, 150, 150); text(i, 0, -15); pop();
 				// Y axis

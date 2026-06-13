@@ -105,6 +105,8 @@ class Puppet {
         };
 
         // Global positions of certain parts for specifc uses in animation
+        this.global_string_pos_upper_arm_r; // position to allow a string to be tied to the upper right arm (near elbow)
+        this.global_string_pos_upper_arm_l; // position to allow a string to be tied to the upper left arm (near elbow)
         this.global_string_pos_lower_arm_r; // position to allow a string to be tied to the lower right arm
         this.global_string_pos_lower_arm_l; // position to allow a string to be tied to the lower left arm
         this.global_string_pos_neck; // position to allow a string to be tied to the neck joint
@@ -565,6 +567,14 @@ class Puppet {
         // rotateZ(radians(-30)); // REMOVE LATER
         // ROTATIONS OF SHOULDER_R WILL BE PLACED HERE
         this.#applyRotation(time_current,this.shoulder_r_rot_kfs, 'shoulder_r');
+
+        // Get the global position of a part of the upper arm to allow a string to be tied to it
+        push();
+            translate(0,-20,0);
+            translate(0, height_upper_arm - 20, 0); // translated towards the elbow
+            this.global_string_pos_upper_arm_r = getGlobalPosition();
+        pop();
+
         this.#drawPart(upper_arm_shape, 'upper_arm_r');
         
 
@@ -597,6 +607,14 @@ class Puppet {
         // rotateZ(radians(30)); // REMOVE LATER
         // ROTATIONS OF SHOULDER_L WILL BE PLACED HERE
         this.#applyRotation(time_current,this.shoulder_l_rot_kfs, 'shoulder_l');
+
+        // Get the global position of a part of the upper arm to allow a string to be tied to it
+        push();
+            translate(0,-20,0);
+            translate(0, height_upper_arm - 20, 0); // translated towards the elbow
+            this.global_string_pos_upper_arm_l = getGlobalPosition();
+        pop();
+
         this.#drawPart(upper_arm_shape, 'upper_arm_l');
         
         

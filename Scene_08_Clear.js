@@ -35,15 +35,28 @@ class Scene_08_Clear extends Scene {
 
         // neck
         this.puppet.addRotation('neck', new KeyFrame(762, [-40,0,0], 'easeOut'));
-        this.puppet.addRotation('neck', new KeyFrame(773, [-40,-45,0], 'linear'));
+        this.puppet.addRotation('neck', new KeyFrame(773-3, [-40,-45,0], 'linear'));
         this.puppet.addRotation('neck', new KeyFrame(777, [-40,-45,0], 'easeInOut'));
-        this.puppet.addRotation('neck', new KeyFrame(792, [-40,45,0], 'easeInOut'));
+        this.puppet.addRotation('neck', new KeyFrame(792-6, [-40,45,0], 'easeInOut'));
         this.puppet.addRotation('neck', new KeyFrame(797, [-40,45,0], 'easeInOut'));
         this.puppet.addRotation('neck', new KeyFrame(807, [-40,0,0], 'easeInOut'));
         this.puppet.addRotation('neck', new KeyFrame(811, [-40,0,0], 'easeInOut'));
         this.puppet.addRotation('neck', new KeyFrame(825, [60,0,0], 'easeInOut'));
-        // this.puppet.addRotation('neck', new KeyFrame(762, [-90,0,0], 'linear'));
 
+        this.puppet.addProcedural('hips_leg_r', (time_current, [x,y,z]) => {
+            let amplitudes = [10,5,2];
+            let frequencies = [0.7,0.5,0.5];
+            let times = [time_current+500, time_current+1500, time_current+2500];
+            let noise_values = noise_func_to_value([x,y,z], times, amplitudes, frequencies);
+            return [noise_values.x, noise_values.y, noise_values.z];
+        })
+        this.puppet.addProcedural('hips_leg_l', (time_current, [x,y,z]) => {
+            let amplitudes = [10,5,2];
+            let frequencies = [0.7,0.5,0.5];
+            let times = [time_current, time_current+1000, time_current+2000];
+            let noise_values = noise_func_to_value([x,y,z], times, amplitudes, frequencies);
+            return [noise_values.x, noise_values.y, noise_values.z];
+        })
         // 
 
 
@@ -67,7 +80,7 @@ class Scene_08_Clear extends Scene {
         
         // Display objects ----------------------
         push();
-            stroke(255);
+            stroke(191);
             strokeWeight(10);
             this.puppet.display(time_current);
             

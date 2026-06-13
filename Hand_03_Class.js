@@ -70,6 +70,12 @@ class Hand {
 		// Procedural animations map
 		this.procedural_functions = {};
 
+		// Global positions of finger tips for animation use
+		this.global_string_pos_pinky;
+		this.global_string_pos_ring;
+		this.global_string_pos_middle;
+		this.global_string_pos_index;
+		this.global_string_pos_thumb;
 	}
 
 	/**
@@ -284,11 +290,7 @@ class Hand {
 		push();
 		translate(0, -heights_list[2]/2, 0); 
 		// Grab the position of the tip
-		noStroke();
-		fill(220);
-		global_finger_pos = getGlobalPosition();
-		// rotateY(PI/10);
-		// cylinder(23,9,5,1); // REMOVE LATER (testing the lines attached to the fingers)
+		this['global_string_pos_' + finger_name] = getGlobalPosition();
 		// Translate back so the drawing isn't messed up
 		pop();
 		// -------------------- AI GENERATED NOW END --------------------
@@ -313,6 +315,17 @@ class Hand {
 		// section 2 (translate to top of section 1)
 		translate(0, -thumb_heights_list[1], 0);
 		this.#applyRotation(time_current, rot_kfs_list[2], finger_name + '2');
+
+		// -------------------- AI GENERATED NOW START --------------------
+		// Translate to the very tip of the finger
+		push();
+		translate(0, -thumb_heights_list[2]/2, 0); 
+		// Grab the position of the tip
+		this['global_string_pos_' + finger_name] = getGlobalPosition();
+		// Translate back so the drawing isn't messed up
+		pop();
+		// -------------------- AI GENERATED NOW END --------------------
+
 		this.#drawPart(shapes_list[2]);
 		
 		pop();

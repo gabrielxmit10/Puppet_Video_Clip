@@ -250,7 +250,7 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
-let [ frame_start, frame_end ] = [ 762 , 950 ]; // has the same unit as the keyframe_version variable
+let [ frame_start, frame_end ] = [ 920 , 1100 ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
@@ -277,6 +277,10 @@ function setup() {
 	scenes_list.push(new Scene_06_Around(596, 680));
 	scenes_list.push(new Scene_07_Pulled(680, 762));
 	scenes_list.push(new Scene_08_Clear(762, 850));
+	scenes_list.push(new Scene_09_Puppet_to_You(850, 929));
+	// ASK AI to change the folder that i have the puppet and the angles of joints in sliders so that it also allows for changing the order of the rotations for a specific joint
+
+	// OR also the possibility of making that change for multiple joints at a time (so it would have sth to select for each and then id apply the change, itd also be good to have the mode like "yzx" displayed on its side and it should be according to the order that i do it in my program normally)
 	
 
 	// camera(1532, -17, 93, 33, -1, 81);
@@ -296,12 +300,13 @@ function setup() {
 	camera(1927, 90, 2052, -35, 151, 39);
 	camera(1749, -573, 1928, -39, 30, -64);
 	camera(0, 733, 2267, 0, 0+100, -58);
-	camera(100, -2242, 341, -51, 32, -328);
 	
-	// let ang_cam = radians(45); 
-	// let raio = 2000; let altura = -600;
-	// camera(cos(ang_cam)*raio, 0+altura+1300, sin(ang_cam)*raio,0,altura,0);
-
+	camera(0, 16, 3987, 59, -970, 62);
+	camera(228, -430, 687, 158, -1161, 422);
+	camera(1001, 1097, 3477, 21, -963, 108);
+	
+	camera(2300, 986, 2623, 51, -1023, -108);
+	
 }
 
 let time_current;

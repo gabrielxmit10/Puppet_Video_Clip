@@ -250,7 +250,7 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
-let [ frame_start, frame_end ] = [ 1010, 1090  ]; // has the same unit as the keyframe_version variable
+let [ frame_start, frame_end ] = [ 1010, 1112 ]; // has the same unit as the keyframe_version variable
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds, calculated from the frame numbers and the keyframe_version
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
 
@@ -300,6 +300,8 @@ function setup() {
 	
 	camera(3095, -600, 2427, -62, 55, -55);
 	camera(0,0,1200,0,0,0);
+	camera(0,0,1029,0,0,0);
+	// camera(0, 0, 1184, 0, 0, 0);
 	
 }
 

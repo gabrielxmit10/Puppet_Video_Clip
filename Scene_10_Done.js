@@ -11,7 +11,7 @@
 class Scene_10_Done extends Scene {
 
     constructor(start_frame, end_frame) {
-        super(start_frame, end_frame); // 929, 1034 
+        super(start_frame, end_frame); // 929, 1010
 
         // Initialize necessary objects and lists
         this.puppet1 = new Puppet();
@@ -51,13 +51,13 @@ class Scene_10_Done extends Scene {
         this.raio = 2000+500; this.altura = -540; this.under_altura = 1000;
         let base_angle = 20;
         let start_angle = radians(-base_angle); let end_angle = radians(base_angle); 
-        let start_rot_frame = 929-20; let end_rot_frame = 976-6;
+        let start_rot_frame = 929-0; let end_rot_frame = 976-6;
         // let speed = (end_angle - start_angle) / (end_rot_frame - start_rot_frame);
         let duration = (end_rot_frame - start_rot_frame);
         this.ang_cam_kf_list.push(new KeyFrame(start_rot_frame, start_angle, 'linear')); // start seeing puppet1
         this.ang_cam_kf_list.push(new KeyFrame(end_rot_frame, end_angle, 'linear')); // end seeing puppet1
-        this.ang_cam_kf_list.push(new KeyFrame(989-6, radians(180-base_angle), 'linear')); // start seeing puppet2
-        this.ang_cam_kf_list.push(new KeyFrame(989-6 + duration, radians(180+base_angle), 'linear')); // end seeing puppet2
+        this.ang_cam_kf_list.push(new KeyFrame(989-6-4, radians(180-base_angle), 'linear')); // start seeing puppet2
+        this.ang_cam_kf_list.push(new KeyFrame(989-6-4 + duration, radians(180+base_angle), 'linear')); // end seeing puppet2
         console.log(start_rot_frame, end_rot_frame, duration);
 
     }

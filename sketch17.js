@@ -273,24 +273,8 @@ function keyPressed() {
   }
 // -------------------- AI GENERATED NOW END --------------------
 }
-// function initialText() {
-// 	if (!song.isPlaying()) {
-// 		songTime = 0;
-// 		// background(255, 0, 0);
-// 		textFont(fontBeforeStart);
-// 		textSize(24);
-// 		fill(255, 255, 255,);
-// 		textAlign(CENTER, CENTER);
-// 		// text('Press "Space" to play the song', 0, 0);
-//   	}
-// }
-function findTimeCurrent() {
-	// REMOVE LATER
-	// let time_current1 = song.currentTime(); // time in seconds according to the music
-	// let time_current2 = floor(time_current1 * framerate) / framerate;; // transform time in steps of 1/framerate with floor(time*fps)/fps
-	// let time_current = handleEditorMode(time_current2);
-	// console.log('time_current1:',time_current1,'time_current2:', time_current2, 'time_current3:', time_current); // print time_current2 and time_current3 to see the difference
 
+function findTimeCurrent() {
 	let time_current = song.currentTime(); // time in seconds according to the music
 	time_current = floor(time_current * framerate) / framerate;; // transform time in steps of 1/framerate with floor(time*fps)/fps
 	time_current = handleEditorMode(time_current);
@@ -341,7 +325,7 @@ let editor_mode = 'editor';
 let [ frame_start, frame_end ] = [ 0, 1335 ]; // Ends exactly when the last scene finishes
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
-let debug_camera_control = true; // toggle this to use orbit control on all scenes to look around (it deactivates the animations of the camera in the scenes. So basically an "if")
+// let debug_camera_control = true; // toggle this to use orbit control on all scenes to look around (it deactivates the animations of the camera in the scenes. So basically an "if")
 
 let scenes_list = [];
 let subtitle_manager;
@@ -449,7 +433,7 @@ function draw() {
 	background(50);
 	perspective(2*atan(height/2/800),width/height,0.1*800, 30 * 800);
 	if (!is_capturing) 
-		if (debug_camera_control !== undefined && debug_camera_control === true) {
+		if (typeof debug_camera_control !== 'undefined' && debug_camera_control === true) {
 			orbitControl(); // Only allow orbitControl in live mode
 		}
 		// orbitControl();

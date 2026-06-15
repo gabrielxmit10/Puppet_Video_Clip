@@ -68,24 +68,6 @@ function createTremble(timeOffsets, amplitude, frequency) {
     };
 }
 
-// CHANGE LATER - see if you should remove this or if you will use this
-// function sequenceProcedurals(sequence) { // this will be called in puppet.addProcedural where 
-//     // sequence is an array of arrays: [ [start_time, end_time, function_to_apply], ... ]
-//     return (time_current, base_value) => {
-//         let frame_current = time_current * keyframe_version;
-//         for (let i = 0; i < sequence.length; i++) {
-//             let [start, end, func] = sequence[i];
-            
-//             // If the current time falls within this interval, use its procedural function!
-//             if (frame_current >= start && frame_current < end) {
-//                 return func(time_current, base_value);
-//             }
-//         }
-//         // If we aren't inside any defined interval, just return the value unmodified
-//         return base_value;
-//     };
-// }
-
 class Scene_12_Falling extends Scene {
 
     constructor(start_frame, end_frame) {
@@ -99,7 +81,6 @@ class Scene_12_Falling extends Scene {
         this.amplitudes_tremble_all_kf_list = [];
         this.frequencies_tremble_all_kf_list = [];
         this.camera_shots_list = [];
-        // this.sequence_procedurals_puppet = []; // CHANGE LATER - see if you should remove this or if you will use this
 
         // start,,,,,end(end)
         // Add Keyframes for each class property and manipulate them (like changeMode or hidePart)
@@ -109,7 +90,7 @@ class Scene_12_Falling extends Scene {
         let part3_start = 1210; // from the side going past
         // let parts_end = end_frame;
         let part4_start = 1237;
-        let part5_start = 1256; // CHANGE LATER - REMOVE ALL THATS PART 5
+        let parts_end = 1256;
         
         // ------------------------------ FOR ALL SCENES ------------------------------
         
@@ -250,17 +231,17 @@ class Scene_12_Falling extends Scene {
         this.puppet.addTranslation('full_body', new KeyFrame(part4_start, [0, puppet_pos_part4, 0], 'linear'));
         // this.puppet.addTranslation('full_body', new KeyFrame(1242-1.5, [0, -4000, 0], 'linear'));
         // this.puppet.addTranslation('full_body', new KeyFrame(1242+1.5, [0, 4000, 0], 'constant'));
-        this.puppet.addTranslation('full_body', new KeyFrame(part5_start, [0, puppet_pos_end, 0], 'constant'));
+        this.puppet.addTranslation('full_body', new KeyFrame(parts_end, [0, puppet_pos_end, 0], 'constant'));
         
         // background translation (moves but less then part 1)
         this.translate_background_kf_list.push(new KeyFrame(part4_start, [0, 2000+500, 0],'linear'));
-        this.translate_background_kf_list.push(new KeyFrame(part5_start, [0, 2000-500, 0],'constant'));
+        this.translate_background_kf_list.push(new KeyFrame(parts_end, [0, 2000-500, 0],'constant'));
         
         // camera 
         // this.camera_kf_list2.push(new KeyFrame(part4_start, [-3604, 3023, 366, 0, puppet_pos_part4, 0], 'linear'));
         // this.camera_kf_list2.push(new KeyFrame(end_frame, [-3604, 3023, 366, 0, puppet_pos_end, 0], 'constant'));
         this.camera_kf_list2.push(new KeyFrame(part4_start, [-4500, 0, 0, 0, puppet_pos_part4, 0], 'easeInOut'));
-        this.camera_kf_list2.push(new KeyFrame(part5_start, [-4500, 0, 0, 0, puppet_pos_end, 0], 'constant'));
+        this.camera_kf_list2.push(new KeyFrame(parts_end, [-4500, 0, 0, 0, puppet_pos_end, 0], 'constant'));
         
         // tremble all 
         this.amplitudes_tremble_all_kf_list.push(new KeyFrame(part4_start,[0,0,0], 'constant'));
@@ -269,15 +250,6 @@ class Scene_12_Falling extends Scene {
         this.frequencies_tremble_all_kf_list.push(new KeyFrame(1242+1,[5,2,5], 'linear'));
         this.frequencies_tremble_all_kf_list.push(new KeyFrame(1242+12,[5,0,5], 'constant'));
         
-        
-        
-        
-        // ------------------------------ SCENE PART 5 (falling, big camera) ------------------------------
-        
-        // camera (big)
-        this.camera_kf_list1.push(new KeyFrame(part5_start, [-9533+600, -751, 0, 0, -2752, 0], 'easeIn'));
-        // this.camera_kf_list2.push(new KeyFrame(part5_start, [-4500, 0, 0, 0, puppet_pos_end, 0], 'constant'));
-
 
 
         this.camera_shots_list = [
@@ -285,7 +257,6 @@ class Scene_12_Falling extends Scene {
             new Shot(part2_start, this.camera_kf_list2),
             new Shot(part3_start, this.camera_kf_list1),
             new Shot(part4_start, this.camera_kf_list2),
-            new Shot(part5_start, this.camera_kf_list1),
         ]
         
 

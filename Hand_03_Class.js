@@ -6,17 +6,6 @@
 
 
 class Hand {
-	// Guide of use (methods):
-	// - TBD (CHANGE LATER - continue writing)
-	// - addRotationX(s, kf) to add a keyframe for rotation in X axis (same for Y and Z)
-	//		- For X and Z you can also refer to a finger as a whole (like "pinky") and give an array with 3 values and each value will be the X/Z rotation each joint of that finger, from bottom to top ( like "index0", "index1", "index2")
-    // - addRotation(s, kf) to add a keyframe for rotation in all axes at once (kf.value needs to be an array of 3 values for each axis)
-    // - changeRotationMode(s, mode) to change the order of rotation for a specific joint (s) with the mode string (like "YZX")
-	// - addRotationMode(s, kf) to add a keyframe for rotation mode for a specific joint (s) with the mode string (like "YZX") ( to use do like this.addRotationMode('arm', new KeyFrame(0, 'YZX')) )
-	// - display(time_current) to display the hand
-
-
-
 
 	constructor() {
 

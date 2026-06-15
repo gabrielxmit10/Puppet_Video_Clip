@@ -53,32 +53,12 @@ let height_factor_foot = 1.2; // this is the factor that scales the foot in the 
 let depth_factor_foot = 1.6; // this is the factor that scales the foot in the z direction, making it deeper and more like a shoe
 
 
-
-// JOINT related variables
-// Base Joints Positions: --------------------
-
-let full_body_pos;
-let hips_pos;
-let neck_pos;
+// Necessary Joints Positions: --------------------
 let shoulder_r_pos;
 let shoulder_l_pos;
-let hip_leg_r_pos;
-let hip_leg_l_pos;
-
-// Joints Derived (from base + body parts): --------------------
-// REMOVE LATER (i dont think I ever used these joint positions)
-
-let elbow_r_pos;
-let elbow_l_pos;
-let hand_r_pos; // not joint but used for placing hands
-let hand_l_pos; // not joint but used for placing hands
-let knee_r_pos;
-let knee_l_pos;
-let ankle_r_pos;
-let ankle_l_pos;
 
 // ------------------------------ Variables Initialization Function ------------------------------
-function initPuppetVariables(){
+function initPuppetVariables(){ // colors and joint position
     // Initialize colors
     color_body = color("rgba(128, 128, 128, 1)");
     color_upper_arm = color("rgba(110, 110, 110, 1)");
@@ -88,28 +68,13 @@ function initPuppetVariables(){
     color_lower_leg = color_upper_arm;
     color_foot = color_upper_arm;
 
-    // Initialize base joint positions
-    full_body_pos = createVector(0, 155, 0); // in the middle of the torso, to rotate the whole body around this point
-    hips_pos = createVector(0, 160, 0); // in the middle of the hemisphere of the lower part of the torso, to rotate the torso around this point
-    neck_pos = createVector(0, 0, 0);
+    // Initialize joint positions
     shoulder_r_pos = createVector(60, 40, 0);
     shoulder_l_pos = createVector(-60, 40, 0);
-    hip_leg_r_pos = createVector(50, 250, 0);
-    hip_leg_l_pos = createVector(-50, 250, 0);
-
-    // Initialize derived joint positions
-    elbow_r_pos = shoulder_r_pos.copy().add(createVector(0, height_upper_arm, 0));
-    elbow_l_pos = shoulder_l_pos.copy().add(createVector(0, height_upper_arm, 0));
-    hand_r_pos = elbow_r_pos.copy().add(createVector(0, height_lower_arm, 0));
-    hand_l_pos = elbow_l_pos.copy().add(createVector(0, height_lower_arm, 0));
-    knee_r_pos = hip_leg_r_pos.copy().add(createVector(0, height_upper_leg, 0));
-    knee_l_pos = hip_leg_l_pos.copy().add(createVector(0, height_upper_leg, 0));
-    ankle_r_pos = knee_r_pos.copy().add(createVector(0, height_lower_leg, 0));
-    ankle_l_pos = knee_l_pos.copy().add(createVector(0, height_lower_leg, 0));
 }
 
 // ------------------------------ Geometry Initialization Function ------------------------------
-function initPuppetGeometries() { // this has to be called in setup (REMOVE LATER - Idk what setup yet, since I will have multiple scenes, and Idk how that would work, but in some setup this will have to be called)
+function initPuppetGeometries() { // this has to be called in setup
   // -------------------- Head Geometry Start --------------------
   beginGeometry();
   create_puppet_head(radius_head);

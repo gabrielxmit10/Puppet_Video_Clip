@@ -36,12 +36,6 @@ class Scene_05_Theater extends Scene {
         this.puppet.changeRotationMode('shoulder_l', 'ZYX');
         this.puppet.addRotation('shoulder_r', new KeyFrame(0, [0,0,-90], 'constant'));
         this.puppet.addRotation('shoulder_l', new KeyFrame(0, [0,0,90], 'constant'));
-
-        // CHANGE LATER (Either remove the following or change, they are for the case that u might want to make the arms bend a bit, as if pulling the strings a bit when the camera looks at the respective hand and coming back fast to show the character is really tied by the strings. To keep this simpler for now I wont test yet)
-        // this.puppet.addRotation('shoulder_r', new KeyFrame(0, [-40+20,0,-90]));
-        // this.puppet.addRotation('shoulder_l', new KeyFrame(0, [-40+20,0,90]));
-        // this.puppet.addRotation('elbow_r', new KeyFrame(0, [40*2,0,0]));
-        // this.puppet.addRotation('elbow_l', new KeyFrame(0, [40*2,0,0]));
         
         // this.camera1_kf_list.push(new KeyFrame(420, [-1, -796, -134, -1, -711, -29], 'constant')); // wait
         this.camera1_kf_list.push(new KeyFrame(415, [-1, -796, -134, -1, -711, -29], 'easeInOut'));

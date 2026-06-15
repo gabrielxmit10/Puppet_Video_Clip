@@ -1,9 +1,5 @@
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-
-// let keyframe_version = 24; // This represents the unit of frames we use in our keyframe list
-// let framerate = 24; // This represents the framerate of our animation
-
 /**
  * * @typedef {"XYZ"|"XZY"|"YXZ"|"YZX"|"ZXY"|"ZYX"} RotationMode 
 */
@@ -73,6 +69,15 @@ class KeyFrame {
         //		Each keyframe has their type of lerp, BUT if you dont say the type of interpolation, the program will check for the LAST TYPE USED and use that
         //		If you never said the type of interpolation, it will default to "easeInOut"
 	}
+}
+
+class Shot {
+    // each shot is a list of kfs and a starting frame, and it will be active from its start frame to the next shot's start frame
+    // it represents that at start_frame, the kf_list will turn active and will keep its keyframes until the next shot's start_frame
+    constructor(start_frame, kf_list) {
+        this.start_frame = start_frame;
+        this.kf_list = kf_list;
+    }
 }
 
 function find_kf_and_type(frame_current, kf_list) { // finds the 2 keyframes that frame_current is between and the type of lerp of the keyframe before it
@@ -159,15 +164,6 @@ function animate_kfs(time_current, kf_list) { // takes the current time in secon
 
 	return kf_lerp(kf1, kf2, t, type_of_lerp);
 
-}
-
-class Shot {
-    // each shot is a list of kfs and a starting frame, and it will be active from its start frame to the next shot's start frame
-    // it represents that at start_frame, the kf_list will turn active and will keep its keyframes until the next shot's start_frame
-    constructor(start_frame, kf_list) {
-        this.start_frame = start_frame;
-        this.kf_list = kf_list;
-    }
 }
 
 function animate_shots(time_current, shots_list) { // takes the current time and a list of shots [{start_frame: 0, kf_list: []}, ...] and returns the interpolated value for the active shot

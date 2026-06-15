@@ -464,7 +464,7 @@ class Puppet {
         // TRANSLATIONS OF FULL_BODY WILL BE PLACED HERE
         this.#applyTranslation(time_current, this.full_body_trans_kfs, 'full_body');
 
-        // ROTATIONS OF FULL_BODY WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.full_body_rot_kfs, 'full_body');
 
         
@@ -475,19 +475,19 @@ class Puppet {
 
         // Upper Leg
         translate(50, 250, 0);
-        // ROTATIONS OF hips_leg_R WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.hips_leg_r_rot_kfs, 'hips_leg_r');
         this.#drawPart(upper_leg_shape, 'upper_leg_r');
 
         // Lower Leg
         translate(0, height_upper_leg, 0);
-        // ROTATIONS OF KNEE_R WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.knee_r_rot_kfs, 'knee_r');
         this.#drawPart(lower_leg_shape, 'lower_leg_r');
 
         // Foot
         translate(0, height_lower_leg + radius_lower_leg, 0);
-        // ROTATIONS OF ANKLE_R WILL BE PLACED HERE
+        
         translate(0, -30, 10)
         this.#applyRotation(time_current,this.ankle_r_rot_kfs, 'ankle_r');
         translate(0, 30, -10)
@@ -501,19 +501,19 @@ class Puppet {
         
         // Upper Leg
         translate(-50, 250, 0);
-        // ROTATIONS OF hips_leg_L WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.hips_leg_l_rot_kfs, 'hips_leg_l');
         this.#drawPart(upper_leg_shape, 'upper_leg_l');
 
         // Lower Leg
         translate(0, height_upper_leg, 0);
-        // ROTATIONS OF KNEE_L WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.knee_l_rot_kfs, 'knee_l');
         this.#drawPart(lower_leg_shape, 'lower_leg_l');
 
         // Foot
         translate(0, height_lower_leg + radius_lower_leg, 0);
-        // ROTATIONS OF ANKLE_L WILL BE PLACED HERE
+        
         translate(0, -30, 10)
         this.#applyRotation(time_current,this.ankle_l_rot_kfs, 'ankle_l');
         translate(0, 30, -10)
@@ -525,13 +525,13 @@ class Puppet {
 
 
         translate(0, 220, 0);
-        // ROTATIONS OF HIPS WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.hips_rot_kfs, 'hips');
         translate(0, -220, 0);
 
         // -------------------- Head Start --------------------
         push();
-        // ROTATIONS OF NECK WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.neck_rot_kfs, 'neck');
         // -------------------- AI GENERATED NOW START --------------------
         // Use our new function to grab the absolute position!
@@ -564,8 +564,6 @@ class Puppet {
         
         // Upper Arm ------------------------------
         translate(shoulder_r_pos);
-        // rotateZ(radians(-30)); // REMOVE LATER
-        // ROTATIONS OF SHOULDER_R WILL BE PLACED HERE
         this.#applyRotation(time_current,this.shoulder_r_rot_kfs, 'shoulder_r');
 
         // Get the global position of a part of the upper arm to allow a string to be tied to it
@@ -580,14 +578,13 @@ class Puppet {
 
         // Lower Arm ------------------------------
         translate(0, height_upper_arm, 0); // place at the end of upper arm
-        // ROTATIONS OF ELBOW_R WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.elbow_r_rot_kfs, 'elbow_r');
 
         // Get the global position of a part of the lower arm to allow a string to be tied to it (in scene 02)
         push();
             translate(0, height_lower_arm-radius_hand-20, 0); // translate to right above the hand
             this.global_string_pos_lower_arm_r = getGlobalPosition(); // Get the global position
-            // console.log("Global position of lower arm for string: ", this.global_lower_arm_r_string_pos); // REMOVE LATER - just for checking the position is correct in the console
         pop();
 
         this.#drawPart(lower_arm_shape, 'lower_arm_r');
@@ -603,9 +600,7 @@ class Puppet {
         // ---------- Left Arm ----------
         push();
         // Upper Arm ------------------------------
-        translate(shoulder_l_pos);
-        // rotateZ(radians(30)); // REMOVE LATER
-        // ROTATIONS OF SHOULDER_L WILL BE PLACED HERE
+        translate(shoulder_l_pos);        
         this.#applyRotation(time_current,this.shoulder_l_rot_kfs, 'shoulder_l');
 
         // Get the global position of a part of the upper arm to allow a string to be tied to it
@@ -620,14 +615,13 @@ class Puppet {
         
         // Lower Arm ------------------------------
         translate(0, height_upper_arm, 0); // place at the end of upper arm
-        // ROTATIONS OF ELBOW_L WILL BE PLACED HERE
+        
         this.#applyRotation(time_current,this.elbow_l_rot_kfs, 'elbow_l');   
         
         // Get the global position of a part of the lower arm to allow a string to be tied to it (in scene 02)
         push();
             translate(0, height_lower_arm-radius_hand-20, 0); // translate to right above the hand
             this.global_string_pos_lower_arm_l = getGlobalPosition(); // Get the global position
-            // console.log("Global position of lower arm for string: ", this.global_lower_arm_r_string_pos); // REMOVE LATER - just for checking the position is correct in the console
         pop();
         
         this.#drawPart(lower_arm_shape, 'lower_arm_l');

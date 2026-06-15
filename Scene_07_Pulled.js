@@ -166,7 +166,9 @@ class Scene_07_Pulled extends Scene {
         // Camera ----------------------
         // camera(...animate_kfs(time_current, this.camera_kf_list));
         let ang_cam = animate_kfs(time_current, this.ang_cam_kf_list);
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(cos(ang_cam)*this.raio, 0+this.altura+this.under_altura, sin(ang_cam)*this.raio,0,this.altura,0);
+        }
         
         // Display objects ----------------------
         push();

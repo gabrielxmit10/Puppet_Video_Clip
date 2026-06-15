@@ -78,7 +78,9 @@ class Scene_04_Spin extends Scene {
         // Camera ----------------------
 
         push();
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(...animate_kfs(time_current, this.camera_kf_list),0,1,0);
+        }
         _renderer._curCamera.roll(radians(animate_kfs(time_current, this.camera_spin_kf_list)));
         // Display objects ----------------------
         

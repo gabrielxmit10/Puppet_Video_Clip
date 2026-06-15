@@ -88,7 +88,9 @@ class Scene_09_Puppet_to_You extends Scene {
     display(time_current) {
         
         // Camera ----------------------
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(...animate_shots(time_current, this.camera_shots_kf_list));
+        }
         
         // Display objects ----------------------
         push();

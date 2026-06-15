@@ -103,7 +103,9 @@ class Scene_06_Around extends Scene {
     display(time_current) {
         
         // Camera ----------------------
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(...animate_kfs(time_current, this.camera_kf_list));
+        }
         
         // Display objects ----------------------
         
@@ -136,7 +138,9 @@ class Scene_06_Around extends Scene {
         push();
             this.puppet_layer.begin();
                 clear(); // erase the puppet from last frame
+                if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
                 camera(...animate_kfs(time_current, this.camera_kf_list));
+                }
                 
                 translate(translate_point);
                 let translate_rotation = (time,radius) => {
@@ -160,7 +164,9 @@ class Scene_06_Around extends Scene {
 
             // reset model matrix to use the default camera (z=800) to display the puppet
             resetMatrix();
+            if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
             camera(0, 0, 800, 0, 0, 0, 0, 1, 0);
+            }
 
             // applying opacity and draw the image of the puppet
             tint(255, current_puppet_alpha); 
@@ -173,7 +179,9 @@ class Scene_06_Around extends Scene {
             this.hand_layer.begin();
                 clear(); // erase the hand from last frame
                 // apply the exact same camera to the layer so it captures the 3D perspective
+                if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
                 camera(...animate_kfs(time_current, this.camera_kf_list));
+                }
                 this.hand.display(time_current);
             this.hand_layer.end();
 
@@ -183,7 +191,9 @@ class Scene_06_Around extends Scene {
             
             // reset model matrix to use the default camera (z=800) to display the hand
             resetMatrix();
+            if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
             camera(0, 0, 800, 0, 0, 0, 0, 1, 0);
+            }
 
             // applying opacity and draw the image of the hand
             tint(255, current_hand_alpha); 

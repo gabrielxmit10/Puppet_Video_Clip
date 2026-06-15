@@ -226,7 +226,9 @@ class Scene_03_Strumming extends Scene {
     display(time_current) {
 
         // Camera ----------------------
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(...animate_kfs(time_current, this.camera_kf_list));
+        }
         // camera(1292, 0, 0, 0, 0, 0);
         // camera(2018, 0, 0, 0, 0, 0);
 

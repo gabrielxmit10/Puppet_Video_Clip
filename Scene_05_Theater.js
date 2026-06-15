@@ -199,7 +199,9 @@ class Scene_05_Theater extends Scene {
 
         push();
         // camera(-1, -796, -134, -1, -711, -29);
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(...animate_shots(time_current, this.camera_shot_list));
+        }
 
         let noise_start = 410/keyframe_version; let noise_end = (-0+505)/keyframe_version; // only apply noise to the camera in this time window (when we are in the puppets vision)
         let amplitudes = [0.1*2, 0.02*2, 0.05*2];

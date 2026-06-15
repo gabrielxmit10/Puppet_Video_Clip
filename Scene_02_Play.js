@@ -63,7 +63,9 @@ class Scene_02_Play extends Scene {
     display(time_current) {
         
         // Camera ----------------------
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(...animate_kfs(time_current, this.camera_kf_list));
+        }
         // camera(...[312, -61, 1244, 255, 7, -5])
         // camera(...[1106, -39, 6, 5, 4, -1])
         

@@ -76,7 +76,9 @@ class Scene_08_Clear extends Scene {
     display(time_current) {
         
         // Camera ----------------------
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(...animate_shots(time_current, this.camera_shot_list));
+        }
         
         // Display objects ----------------------
         push();

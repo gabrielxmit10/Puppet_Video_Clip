@@ -66,7 +66,9 @@ class Scene_10_Done extends Scene {
         
         // Camera ----------------------
         let ang_cam = animate_kfs(time_current, this.ang_cam_kf_list);
+        if (typeof debug_camera_control === 'undefined' || !debug_camera_control) {
         camera(cos(ang_cam)*this.raio, this.altura, sin(ang_cam)*this.raio,0,this.altura,0);
+        }
         
         // Display objects ----------------------
         let scale_hand = 5;

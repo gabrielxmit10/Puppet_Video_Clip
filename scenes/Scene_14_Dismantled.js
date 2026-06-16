@@ -1,5 +1,5 @@
-/// <reference path="./Puppet_03_Class.js" />
-/// <reference path="./Animation_KFs_01.js" />
+/// <reference path="../models/Puppet_03_Class.js" />
+/// <reference path="../animation/Animation_KFs_01.js" />
 /// <reference path="./Scene_Class.js" />
 
 class Scene_14_Dismantled extends Scene {

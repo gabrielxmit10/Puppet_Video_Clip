@@ -1,7 +1,7 @@
-/// <reference path="./Puppet_03_Class.js" />
-/// <reference path="./Hand_03_Class.js" />
-/// <reference path="./Scene_Class.js" />
-/// <reference path="./Scene_01_Dismantled.js" />
+/// <reference path="./models/Puppet_03_Class.js" />
+/// <reference path="./models/Hand_03_Class.js" />
+/// <reference path="./scenes/Scene_Class.js" />
+/// <reference path="./scenes/Scene_01_Dismantled.js" />
 
 
 
@@ -91,6 +91,13 @@ function setupEditorUI() {
 			}
 		});
 
+		let orbit_checkbox = createCheckbox(' orbitControl', false).parent(ui_div);
+		orbit_checkbox.style('display', 'inline-block');
+		orbit_checkbox.style('margin-left', '10px');
+		orbit_checkbox.changed(() => {
+			debug_camera_control = orbit_checkbox.checked();
+		});
+
 		let cam_div = createDiv().position(10, canvas_height + 60);
 		createSpan('Camera (EyeX, EyeY, EyeZ, CenterX, CenterY, CenterZ): ').parent(cam_div);
 		cam_info_input = createInput('').parent(cam_div);
@@ -170,10 +177,10 @@ function handleEditorMode(time_current) {
 function preload() {
 	// Load the texture before setup runs
 	// P5 requires textures to be in the same folder or have valid CORS setup
-	head_tex = loadImage('head_texture.jpg');
-	song = loadSound('Puppet_(John_Michael_Howell).mp3');
-  	// fontBeforeStart = loadFont('Roboto-VariableFont_wdth,wght.ttf');
-  	fontBeforeStart = loadFont('Roboto-VariableFont_wdth,wght.ttf');
+	head_tex = loadImage('media/head_texture.jpg');
+	song = loadSound('media/Puppet_(John_Michael_Howell).mp3');
+  	// fontBeforeStart = loadFont('media/Roboto-VariableFont_wdth,wght.ttf');
+  	fontBeforeStart = loadFont('media/Roboto-VariableFont_wdth,wght.ttf');
 }
 
 // --- PLAYBACK UI (used after pre-rendering completes) ---
@@ -325,7 +332,7 @@ let editor_mode = 'editor';
 let [ frame_start, frame_end ] = [ 0, 1335 ]; // Ends exactly when the last scene finishes
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
-// let debug_camera_control = true; // toggle this to use orbit control on all scenes to look around (it deactivates the animations of the camera in the scenes. So basically an "if")
+let debug_camera_control = false; // toggle this to use orbit control on all scenes to look around (it deactivates the animations of the camera in the scenes. So basically an "if")
 
 let scenes_list = [];
 let subtitle_manager;

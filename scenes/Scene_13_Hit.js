@@ -1,6 +1,6 @@
-/// <reference path="./Puppet_03_Class.js" />
-/// <reference path="./Hand_03_Class.js" />
-/// <reference path="./Animation_KFs_01.js" />
+/// <reference path="../models/Puppet_03_Class.js" />
+/// <reference path="../models/Hand_03_Class.js" />
+/// <reference path="../animation/Animation_KFs_01.js" />
 /// <reference path="./Scene_Class.js" />
 
 

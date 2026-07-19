@@ -11,6 +11,9 @@ class Hand {
 
 		this.arm_rot_kfs = new RotationKeyFrameList();
 		this.palm_rot_kfs = new RotationKeyFrameList();
+		
+		this.arm_trans_kfs = new TranslationKeyFrameList();
+
 		this.finger_rot_kfs = { // each finger has 3 sections, so it will have 3 rotation kf lists
 			// by default, fingers will rotate first in Z (moving left and right), then in X (moving front and back), so the mode is "ZYX" for all
             pinky: [new RotationKeyFrameList("ZYX"), new RotationKeyFrameList("ZYX"), new RotationKeyFrameList("ZYX")], 
@@ -26,6 +29,10 @@ class Hand {
 			'arm': this.arm_rot_kfs,
 			'palm': this.palm_rot_kfs,			
         };
+
+		this.trans_kfs_map = {
+			'arm': this.arm_trans_kfs,
+		};
 
 		// Map just for fingers 
 		this.finger_rot_kfs_map = { //(they can only rotate in X and Z, so the way we deal with them is different)
@@ -85,10 +92,10 @@ class Hand {
 	addRotationMode(s, kf) {
 		if (this.main_rot_kfs_map[s]) {
 			kf.type_of_lerp = 'constant';
-			this.#pushKeyFrame(kf, this.main_rot_kfs_map[s].mode_kfs);
+			this.pushKeyFrame(kf, this.main_rot_kfs_map[s].mode_kfs);
 		} else if (this.finger_rot_kfs_map[s]) {
 			kf.type_of_lerp = 'constant';
-			this.#pushKeyFrame(kf, this.finger_rot_kfs_map[s].mode_kfs);
+			this.pushKeyFrame(kf, this.finger_rot_kfs_map[s].mode_kfs);
 		} else {
 			throw new Error('Joint ' + s + ' not found in addRotationMode()');
 		}
@@ -96,7 +103,7 @@ class Hand {
 
 	// private method to push kf to a list of keyframes (so that they maintain their order and the user can add keyframes in any order they want)
     //      This function should also overwrite if the kf.time is the same as an existing kf in the list
-    #pushKeyFrame(kf, ordered_kf_list) { // pushes into the ordered_list of kfs
+    pushKeyFrame(kf, ordered_kf_list) { // pushes into the ordered_list of kfs
         // make a binary search to find the right place to insert the kf
 
         if (ordered_kf_list.length == 0) { // since this is the first, we set its type_of_lerp to the default one if it was not set by the user (so if it is NO_TYPE_OF_LERP)
@@ -105,7 +112,7 @@ class Hand {
             return;
         }
 
-        // -------------------- AI GENERATED START --------------------
+        // Binary Search for where to push kf
         let low = 0;
         let high = ordered_kf_list.length - 1;
         while (low <= high) {
@@ -122,12 +129,12 @@ class Hand {
                 high = mid - 1; // move search to the left half
             }
         }
-        
-        if (kf.type_of_lerp == KeyFrame.NO_TYPE_OF_LERP) {
+
+        // Find the type of lerp by looking backwards for the last informed type
+        if (kf.type_of_lerp == KeyFrame.NO_TYPE_OF_LERP) { // if not set, look backwards 
             kf.type_of_lerp = (low > 0) ? ordered_kf_list[low - 1].type_of_lerp : KeyFrame.DEFAULT_TYPE_OF_LERP;
         }
         ordered_kf_list.splice(low, 0, kf); // insert kf in the list
-        // -------------------- AI GENERATED END --------------------
     }
 
 	/**
@@ -135,15 +142,15 @@ class Hand {
      */
     addRotationX(s, kf) { // method to add kf to axis from outside
         if (this.main_rot_kfs_map[s]) {
-            this.#pushKeyFrame(kf, this.main_rot_kfs_map[s].x);
+            this.pushKeyFrame(kf, this.main_rot_kfs_map[s].x);
         } else if (this.finger_rot_kfs_map[s]) {
-			this.#pushKeyFrame(kf, this.finger_rot_kfs_map[s].x);
+			this.pushKeyFrame(kf, this.finger_rot_kfs_map[s].x);
 		} else if (this.finger_rot_kfs_overall_map[s]) { // if the user is trying to add a rotation to all sections of a finger at once
 			for (let i = 0; i < 3; i++) {
 				// keyframe values go to each joint of the finger 
 				// (ex: if value is [10,20,30], the first joint will get 10, the second 20 and the third 30 in the X axis)
 				let kf_x = new KeyFrame(kf.time, kf.value[i], kf.type_of_lerp, kf.velocity);
-				this.#pushKeyFrame(kf_x, this.finger_rot_kfs_overall_map[s][i].x);
+				this.pushKeyFrame(kf_x, this.finger_rot_kfs_overall_map[s][i].x);
 			}
 		} else { // throw error
 			throw new Error('Joint ' + s + ' does not have addRotationX()');
@@ -154,9 +161,15 @@ class Hand {
      */
     addRotationY(s, kf) { // method to add kf to axis from outside
         if (this.main_rot_kfs_map[s]) {
-            this.#pushKeyFrame(kf, this.main_rot_kfs_map[s].y);
-        }
-		else { // throw error
+            this.pushKeyFrame(kf, this.main_rot_kfs_map[s].y);
+        } else if (this.finger_rot_kfs_map[s]) {
+			this.pushKeyFrame(kf, this.finger_rot_kfs_map[s].y);
+		} else if (this.finger_rot_kfs_overall_map[s]) { // if the user is trying to add a rotation to all sections of a finger at once
+			for (let i = 0; i < 3; i++) {
+				let kf_y = new KeyFrame(kf.time, kf.value[i], kf.type_of_lerp, kf.velocity);
+				this.pushKeyFrame(kf_y, this.finger_rot_kfs_overall_map[s][i].y);
+			}
+		} else { // throw error
 			throw new Error('Joint ' + s + ' does not have addRotationY()');
 		}
     }
@@ -165,14 +178,16 @@ class Hand {
      */
     addRotationZ(s, kf) { // method to add kf to axis from outside
         if (this.main_rot_kfs_map[s]) {
-            this.#pushKeyFrame(kf, this.main_rot_kfs_map[s].z);
+            this.pushKeyFrame(kf, this.main_rot_kfs_map[s].z);
         } else if (this.finger_rot_kfs_map[s]) {
-			this.#pushKeyFrame(kf, this.finger_rot_kfs_map[s].z);
+			this.pushKeyFrame(kf, this.finger_rot_kfs_map[s].z);
 		} else if (this.finger_rot_kfs_overall_map[s]) { // if the user is trying to add a rotation to all sections of a finger at once
 			// keyframe values go to each joint of the finger 
 			// (ex: if value is [10,20,30], the first joint will get 10, the second 20 and the third 30 in the z axis)
-			let kf_z = new KeyFrame(kf.time, kf.value[i], kf.type_of_lerp, kf.velocity);
-			this.#pushKeyFrame(kf_z, this.finger_rot_kfs_overall_map[s][i].z);
+			for (let i = 0; i < 3; i++) {
+				let kf_z = new KeyFrame(kf.time, kf.value[i], kf.type_of_lerp, kf.velocity);
+				this.pushKeyFrame(kf_z, this.finger_rot_kfs_overall_map[s][i].z);
+			}
 		} else { // throw error
 			throw new Error('Joint ' + s + ' does not have addRotationZ()');
 		}
@@ -186,19 +201,68 @@ class Hand {
             let kf_x = new KeyFrame(kf.time, kf.value[0], kf.type_of_lerp, kf.velocity);
             let kf_y = new KeyFrame(kf.time, kf.value[1], kf.type_of_lerp, kf.velocity);
             let kf_z = new KeyFrame(kf.time, kf.value[2], kf.type_of_lerp, kf.velocity);
-            this.#pushKeyFrame(kf_x, this.main_rot_kfs_map[s].x);
-            this.#pushKeyFrame(kf_y, this.main_rot_kfs_map[s].y);
-            this.#pushKeyFrame(kf_z, this.main_rot_kfs_map[s].z);
+            this.pushKeyFrame(kf_x, this.main_rot_kfs_map[s].x);
+            this.pushKeyFrame(kf_y, this.main_rot_kfs_map[s].y);
+            this.pushKeyFrame(kf_z, this.main_rot_kfs_map[s].z);
         } else if (this.finger_rot_kfs_map[s]) {
 			// create keyframe of each
 			let kf_x = new KeyFrame(kf.time, kf.value[0], kf.type_of_lerp, kf.velocity);
+			let kf_y = new KeyFrame(kf.time, kf.value[1], kf.type_of_lerp, kf.velocity);
 			let kf_z = new KeyFrame(kf.time, kf.value[2], kf.type_of_lerp, kf.velocity);
-			this.#pushKeyFrame(kf_x, this.finger_rot_kfs_map[s].x);
-			this.#pushKeyFrame(kf_z, this.finger_rot_kfs_map[s].z);
-			if (kf.value[1] != 0) {
-				console.warn('Warning: trying to add rotation keyframe with non zero Y value to finger joint ' + s + ' which does not rotate in Y. The Y value will be ignored.');
-			}
+			this.pushKeyFrame(kf_x, this.finger_rot_kfs_map[s].x);
+			this.pushKeyFrame(kf_y, this.finger_rot_kfs_map[s].y);
+			this.pushKeyFrame(kf_z, this.finger_rot_kfs_map[s].z);
 		}
+    }
+
+    addTranslationX(s, kf) { 
+        if (this.trans_kfs_map[s]) {
+            this.pushKeyFrame(kf, this.trans_kfs_map[s].x);
+        } else {
+            throw new Error('Joint ' + s + ' does not have addTranslationX()');
+        }
+    }
+    addTranslationY(s, kf) { 
+        if (this.trans_kfs_map[s]) {
+            this.pushKeyFrame(kf, this.trans_kfs_map[s].y);
+        } else {
+            throw new Error('Joint ' + s + ' does not have addTranslationY()');
+        }
+    }
+    addTranslationZ(s, kf) { 
+        if (this.trans_kfs_map[s]) {
+            this.pushKeyFrame(kf, this.trans_kfs_map[s].z);
+        } else {
+            throw new Error('Joint ' + s + ' does not have addTranslationZ()');
+        }
+    }
+    addTranslation(s, kf) { 
+        if (this.trans_kfs_map[s]) {
+            let kf_x = new KeyFrame(kf.time, kf.value[0], kf.type_of_lerp, kf.velocity);
+            let kf_y = new KeyFrame(kf.time, kf.value[1], kf.type_of_lerp, kf.velocity);
+            let kf_z = new KeyFrame(kf.time, kf.value[2], kf.type_of_lerp, kf.velocity);
+            this.pushKeyFrame(kf_x, this.trans_kfs_map[s].x);
+            this.pushKeyFrame(kf_y, this.trans_kfs_map[s].y);
+            this.pushKeyFrame(kf_z, this.trans_kfs_map[s].z);
+        } else {
+            throw new Error('Joint ' + s + ' does not have addTranslation()');
+        }
+    }
+
+    applyTranslation(time_current, tkf_list, joint_name = null) { 
+        let trans_x = tkf_list.x.length > 0 ? animate_kfs(time_current, tkf_list.x) : 0;
+        let trans_y = tkf_list.y.length > 0 ? animate_kfs(time_current, tkf_list.y) : 0;
+        let trans_z = tkf_list.z.length > 0 ? animate_kfs(time_current, tkf_list.z) : 0;
+
+        // If a procedural function exists, let it modify translations too
+        if (joint_name && this.procedural_functions[joint_name]) {
+            let result = this.procedural_functions[joint_name](time_current, [trans_x, trans_y, trans_z]);
+            trans_x = result[0];
+            trans_y = result[1];
+            trans_z = result[2];
+        }
+
+        translate(trans_x, trans_y, trans_z);
     }
 
     /**
@@ -218,7 +282,7 @@ class Hand {
         }
     }
 
-	#applyRotation(time_current, rkf_list, joint_name = null){ // takes a list of rotation keyframes and applies the correct rotation for the current time (will be called in display)
+	applyRotation(time_current, rkf_list, joint_name = null){ // takes a list of rotation keyframes and applies the correct rotation for the current time (will be called in display)
         
         let rot_x = rkf_list.x.length > 0 ? animate_kfs(time_current, rkf_list.x) : 0;
         let rot_y = rkf_list.y.length > 0 ? animate_kfs(time_current, rkf_list.y) : 0;
@@ -251,71 +315,63 @@ class Hand {
             }
         }
     }
-    #drawPart(shape) { // tests if the shape is not null before drawing (with model(shape))
+    drawPart(shape) { // tests if the shape is not null before drawing (with model(shape))
         if (shape) { 
             // this if is done so the program doesn't crash if the puppet is not fully made yet
             model(shape);
         }
     }
 
-	#apply_and_draw_finger_section(time_current, heights_list, shapes_list, rot_kfs_list, finger_name) {
+	apply_and_draw_finger_section(time_current, heights_list, shapes_list, rot_kfs_list, finger_name) {
 		// this function applies the rotations and draws a section of a finger (used for all sections of all fingers in display())
 		push();
 		// section 0 (no translate since it is at the origin here)
-		this.#applyRotation(time_current, rot_kfs_list[0], finger_name + '0');
-		this.#drawPart(shapes_list[0]);
+		this.applyRotation(time_current, rot_kfs_list[0], finger_name + '0');
+		this.drawPart(shapes_list[0]);
 
 		// section 1 (translate to top of section 0)
 		translate(0, -heights_list[0], 0);
-		this.#applyRotation(time_current, rot_kfs_list[1], finger_name + '1');
-		this.#drawPart(shapes_list[1]);
+		this.applyRotation(time_current, rot_kfs_list[1], finger_name + '1');
+		this.drawPart(shapes_list[1]);
 
 		// section 2 (translate to top of section 1)
 		translate(0, -heights_list[1], 0);
-		this.#applyRotation(time_current, rot_kfs_list[2], finger_name + '2');
+		this.applyRotation(time_current, rot_kfs_list[2], finger_name + '2');
 
-		// -------------------- AI GENERATED NOW START --------------------
-		// Translate to the very tip of the finger
+		// get global position of the finger tip
 		push();
 		translate(0, -heights_list[2]/2, 0); 
-		// Grab the position of the tip
 		this['global_string_pos_' + finger_name] = getGlobalPosition();
-		// Translate back so the drawing isn't messed up
 		pop();
-		// -------------------- AI GENERATED NOW END --------------------
 
-		this.#drawPart(shapes_list[2]);
+		this.drawPart(shapes_list[2]);
 		
 		pop();
 	} 
 
-	#apply_and_draw_thumb_section(time_current, thumb_heights_list, shapes_list, rot_kfs_list, finger_name) {
+	apply_and_draw_thumb_section(time_current, thumb_heights_list, shapes_list, rot_kfs_list, finger_name) {
 		// this function applies the rotations and draws a section of a finger (used for all sections of all fingers in display())
 		push();
 		// section 0 (no translate since it is at the origin here)
-		this.#applyRotation(time_current, rot_kfs_list[0], finger_name + '0');
-		this.#drawPart(shapes_list[0]);
+		this.applyRotation(time_current, rot_kfs_list[0], finger_name + '0');
+		this.drawPart(shapes_list[0]);
 
 		// section 1 (translate here is a bit different, cause we want the bottom of section 1 to sit a bit inside the sphere of section 0)
 		translate(0, -thumb_heights_list[1]/2, 0);
-		this.#applyRotation(time_current, rot_kfs_list[1], finger_name + '1');
-		this.#drawPart(shapes_list[1]);
+		this.applyRotation(time_current, rot_kfs_list[1], finger_name + '1');
+		this.drawPart(shapes_list[1]);
 
 		// section 2 (translate to top of section 1)
 		translate(0, -thumb_heights_list[1], 0);
-		this.#applyRotation(time_current, rot_kfs_list[2], finger_name + '2');
+		this.applyRotation(time_current, rot_kfs_list[2], finger_name + '2');
 
-		// -------------------- AI GENERATED NOW START --------------------
-		// Translate to the very tip of the finger
+		// get global position of the thumb tip
 		push();
 		translate(0, -thumb_heights_list[2]/2, 0); 
-		// Grab the position of the tip
 		this['global_string_pos_' + finger_name] = getGlobalPosition();
-		// Translate back so the drawing isn't messed up
 		pop();
-		// -------------------- AI GENERATED NOW END --------------------
 
-		this.#drawPart(shapes_list[2]);
+		this.drawPart(shapes_list[2]);
 		
 		pop();
 	}
@@ -327,13 +383,14 @@ class Hand {
 		linePerspective(false);
 
 		// Arm
-		this.#applyRotation(time_current, this.arm_rot_kfs, 'arm');
-		this.#drawPart(hand_arm_shape);
+		this.applyTranslation(time_current, this.arm_trans_kfs, 'arm');
+		this.applyRotation(time_current, this.arm_rot_kfs, 'arm');
+		this.drawPart(hand_arm_shape);
 
 		// Palm
 		translate(0, -hand_arm_height, 0); // translate to the top of the arm where the palm is
-		this.#applyRotation(time_current, this.palm_rot_kfs, 'palm');
-		this.#drawPart(hand_palm_shape);
+		this.applyRotation(time_current, this.palm_rot_kfs, 'palm');
+		this.drawPart(hand_palm_shape);
 
 		// -------------------- Fingers (pinky to thumb)--------------------
 
@@ -345,34 +402,34 @@ class Hand {
 		translate(-90, -170, 0); // translate to the base of the pinky
 		rotateY(PI/24); rotateZ(-PI/4); // apply natural rotation of pinky in relation to the palm
 		// function to apply the rotations and draw the sections
-		this.#apply_and_draw_finger_section(time_current, hand_finger_heights.pinky, hand_finger_shapes.pinky, this.finger_rot_kfs.pinky, 'pinky');
+		this.apply_and_draw_finger_section(time_current, hand_finger_heights.pinky, hand_finger_shapes.pinky, this.finger_rot_kfs.pinky, 'pinky');
 		pop();
 
 		// Ring
 		push();
 		translate(-55, -200, 0); // translate to the base of the ring finger
 		rotateZ(-PI/20); // apply natural rotation of ring finger in relation to the palm
-		this.#apply_and_draw_finger_section(time_current, hand_finger_heights.ring, hand_finger_shapes.ring, this.finger_rot_kfs.ring, 'ring');
+		this.apply_and_draw_finger_section(time_current, hand_finger_heights.ring, hand_finger_shapes.ring, this.finger_rot_kfs.ring, 'ring');
 		pop();
 
 		// Middle
 		push();
 		translate(0, -200, 0); // translate to the base of the middle finger
-		this.#apply_and_draw_finger_section(time_current, hand_finger_heights.middle, hand_finger_shapes.middle, this.finger_rot_kfs.middle, 'middle');
+		this.apply_and_draw_finger_section(time_current, hand_finger_heights.middle, hand_finger_shapes.middle, this.finger_rot_kfs.middle, 'middle');
 		pop();
 
 		// Index
 		push();
 		translate(60, -200, 0); // translate to the base of the index finger
 		rotateZ(PI/10); // apply natural rotation of index finger in relation to the palm
-		this.#apply_and_draw_finger_section(time_current, hand_finger_heights.index, hand_finger_shapes.index, this.finger_rot_kfs.index, 'index');
+		this.apply_and_draw_finger_section(time_current, hand_finger_heights.index, hand_finger_shapes.index, this.finger_rot_kfs.index, 'index');
 		pop();
 
 		// Thumb
 		push();
 		translate(75, -65, 0); // translate to where the center of the ball is related to the palm joint at the origin
 		rotateZ(PI/2-PI/8); // apply natural rotation of thumb in relation to the palm
-		this.#apply_and_draw_thumb_section(time_current, hand_finger_heights.thumb, hand_finger_shapes.thumb, this.finger_rot_kfs.thumb, 'thumb');
+		this.apply_and_draw_thumb_section(time_current, hand_finger_heights.thumb, hand_finger_shapes.thumb, this.finger_rot_kfs.thumb, 'thumb');
 		pop();
 
 		pop();

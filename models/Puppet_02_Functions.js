@@ -200,10 +200,11 @@ function create_puppet_head(radius = 100, res_rotations = 50, res_bottom_head = 
 			);
 
 
-			// (AI GENERATED)
-			// Store U, V coordinates alongside the 3D position
-			// U goes from 0 to 1 around the cylinder (j)
-			// V goes from 0 to 0.5 for the bottom part of the head (i)
+			// --- TEXTURE MAPPINGS FOR HEAD BOTTOM ONLY --- (bezier rotated shape)
+			// 	Store U, V coordinates alongside the 3D position
+			// 		U goes from 0 to 1 around the cylinder (j)
+			// 		V goes from 0.5 to 1.0 for the bottom part of the head (i)
+			//		- In the texture it is the bottom of the image
 			let u = j / res_rotations;
 			let v_tex = map(i, 0, res_bottom_head, 0.5, 1.0); // bottom half of texture
 
@@ -249,7 +250,7 @@ function create_puppet_head(radius = 100, res_rotations = 50, res_bottom_head = 
 	endShape(); //
 
 
-	// -------------------- Top of the Head (upper hemisphere only) -------------------- (AI GENERATED)
+	// -------------------- Top of the Head (upper hemisphere only) --------------------
 	push()
 	// translate to make the top connect to the bottom of the head
 	translate(0, -160, 0);
@@ -285,10 +286,10 @@ function create_puppet_head(radius = 100, res_rotations = 50, res_bottom_head = 
 			let z4 = radius * cos(lat0) * sin(lon1);
 
 
-			// (AI GENERATED)
+			// --- TEXTURE MAPPINGS FOR HEAD TOP ONLY --- (hemisphere shape)
 			// Calculate Texture UV mappings for the hemisphere
-			// U is horizontal rotation (0 to 1) -> corresponds to j
-			// V is vertical height (0 to 0.5) -> corresponds to i. (top half of image goes on hemisphere)
+			// 		U is horizontal rotation (0 to 1) -> corresponds to j
+			// 		V is vertical height (0 to 0.5) -> corresponds to i. (top half of image goes on hemisphere)
 			let u0 = j / res_rotations;
 			let u1 = (j + 1) / res_rotations;
 

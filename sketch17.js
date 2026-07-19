@@ -7,7 +7,7 @@
 
 
 
-// ------------------------------ AI GENERATED START ------------------------------
+// ------------------------------ AI GENERATED START: Editor Variables/Functions ------------------------------
 let editor_frame;
 let editor_slider;
 let editor_input;
@@ -30,14 +30,12 @@ function setupEditorUI() {
 		btn_play.mousePressed(() => {
 			is_playing = !is_playing;
 			btn_play.html(is_playing ? 'Pause' : 'Play');
-// -------------------- AI GENERATED NOW START --------------------
 			if (is_playing) {
 				song.play();
 				song.jump(editor_frame / keyframe_version);
 			} else {
 				song.pause();
 			}
-// -------------------- AI GENERATED NOW END --------------------
 		});
 
 		if (editor_mode === 'editor_forward') {
@@ -111,7 +109,6 @@ function handleEditorMode(time_current) {
 		time_current = frame_start / keyframe_version;
 	}
 	else if (editor_mode === 'forward') {
-// -------------------- AI GENERATED NOW START --------------------
 		// Sync 'forward' mode to the music
 		if (song.isPlaying()) {
 			if (song.currentTime() < time_start) {
@@ -121,7 +118,6 @@ function handleEditorMode(time_current) {
 		} else {
 			time_current = time_start;
 		}
-// -------------------- AI GENERATED NOW END --------------------
 	}
 	else if (editor_mode === 'loop') {
 		let duration = time_end - time_start;
@@ -146,7 +142,6 @@ function handleEditorMode(time_current) {
 		}
 	}
 	else if (editor_mode === 'editor' || editor_mode === 'editor_forward') {
-// -------------------- AI GENERATED NOW START --------------------
 		if (is_playing && song.isPlaying()) {
 			// Sync the editor slider directly to the music
 			editor_frame = song.currentTime() * keyframe_version;
@@ -163,11 +158,10 @@ function handleEditorMode(time_current) {
 			}
 		}
 		time_current = editor_frame / keyframe_version;
-// -------------------- AI GENERATED NOW END --------------------
 	}
 	return time_current;
 }
-// ------------------------------ AI GENERATED END ------------------------------
+// ------------------------------ AI GENERATED END: Editor Variables/Functions ------------------------------
 
 
 
@@ -179,89 +173,14 @@ function preload() {
 	// P5 requires textures to be in the same folder or have valid CORS setup
 	head_tex = loadImage('media/head_texture.jpg');
 	song = loadSound('media/Puppet_(John_Michael_Howell).mp3');
-  	// fontBeforeStart = loadFont('media/Roboto-VariableFont_wdth,wght.ttf');
-  	fontBeforeStart = loadFont('media/Roboto-VariableFont_wdth,wght.ttf');
+  	font_loaded = loadFont('media/Roboto-VariableFont_wdth,wght.ttf');
 }
 
-// --- PLAYBACK UI (used after pre-rendering completes) ---
-let playback_ui_div = null;
-let playback_btn_playpause = null;
 
-function setupPlaybackUI(vid) {
-  // The video drives the song — wire all sync through its events
-  vid.addEventListener('play', () => {
-    // stop() first clears any stale paused/stopped state, then jump+play from the right time
-    song.stop();
-    song.play();
-    song.jump(time_start + vid.currentTime);
-    if (playback_btn_playpause) playback_btn_playpause.textContent = '⏸ Pause';
-  });
-  vid.addEventListener('pause', () => {
-    song.pause();
-    if (playback_btn_playpause) playback_btn_playpause.textContent = '▶ Play';
-  });
-  vid.addEventListener('ended', () => {
-    song.stop();
-    if (playback_btn_playpause) playback_btn_playpause.textContent = '▶ Play';
-  });
-  // We only jump the song when the video first starts playing.
-  // The browser will keep them perfectly in sync without constant checking.
-
-  function restartPlayback() {
-    vid.pause();
-    song.stop();  // stop() fully resets, so the next jump() starts clean
-    vid.src = captured_video_blob_url;
-    vid.load();
-    vid.oncanplay = () => { 
-        vid.oncanplay = null; 
-        vid.play();  // triggers 'play' event → song.jump(time_start + 0)
-    };
-  }
-
-  function togglePlayPause() {
-    if (vid.paused || vid.ended) {
-      if (vid.ended) { restartPlayback(); } else { vid.play(); }
-    } else {
-      vid.pause();
-    }
-  }
-
-  // Expose for Space key
-  window._playback_toggle = togglePlayPause;
-  window._playback_restart = restartPlayback;
-
-  // Build simple UI div below the canvas
-  let canvas_elt = document.getElementById('defaultCanvas0');
-  playback_ui_div = document.createElement('div');
-  playback_ui_div.style.position = 'absolute';
-  playback_ui_div.style.left = canvas_elt.offsetLeft + 'px';
-  playback_ui_div.style.top = (canvas_elt.offsetTop + canvas_height + 8) + 'px';
-  playback_ui_div.style.display = 'flex';
-  playback_ui_div.style.gap = '8px';
-  playback_ui_div.style.zIndex = '501';
-  playback_ui_div.style.fontFamily = 'sans-serif';
-
-  playback_btn_playpause = document.createElement('button');
-  playback_btn_playpause.textContent = '▶ Play';
-  playback_btn_playpause.onclick = togglePlayPause;
-
-  let btn_restart = document.createElement('button');
-  btn_restart.textContent = '↺ Restart';
-  btn_restart.onclick = restartPlayback;
-
-  playback_ui_div.appendChild(playback_btn_playpause);
-  playback_ui_div.appendChild(btn_restart);
-  document.body.appendChild(playback_ui_div);
-}
-// ---------------------------------------------------------
-
+// -------------------- AI GENERATED START: Press Space to Play/Pause song --------------------
 function keyPressed() {
-// -------------------- AI GENERATED NOW START --------------------
   if (key === ' ') {
-    if (is_capture_finished) {
-      // Delegate entirely to the playback UI logic
-      if (window._playback_toggle) window._playback_toggle();
-    } else if (song.isPlaying()) {
+    if (song.isPlaying()) {
       // LIVE MODE — pause
       song.pause();
       is_playing = false;
@@ -278,10 +197,10 @@ function keyPressed() {
       }
     }
   }
-// -------------------- AI GENERATED NOW END --------------------
+// -------------------- AI GENERATED END: Press Space to Play/Pause song --------------------
 }
 
-function findTimeCurrent() {
+function findTimeCurrent() { // finds current time based (capped by the framerate) on song and editor_mode
 	let time_current = song.currentTime(); // time in seconds according to the music
 	time_current = floor(time_current * framerate) / framerate;; // transform time in steps of 1/framerate with floor(time*fps)/fps
 	time_current = handleEditorMode(time_current);
@@ -290,7 +209,7 @@ function findTimeCurrent() {
 }
 
 
-// -------------------- AI GENERATED NOW START --------------------
+// -------------------- AI GENERATED START: Get Global Position Function --------------------
 let global_head_pos;
 let global_finger_pos;
 
@@ -300,27 +219,18 @@ function getGlobalPosition() { // returns vector of the global position of the c
 	// The 12th, 13th, and 14th values hold the exact absolute X, Y, and Z
 	return createVector(m[12], m[13], m[14]);
 }
-// -------------------- AI GENERATED NOW END --------------------
+// -------------------- AI GENERATED END: Get Global Position Function --------------------
 
 
 
 // ---------------------------------------- GLOBAL VARIABLES ----------------------------------------
-// --- CAPTURE SETTINGS ---
-let play_pre_rendered = false; // Toggle this! true = render to video then play. false = live 3D
-let capture_test_seconds = 5; // Set to 0 to capture the full animation, or e.g. 5 to only test 5 seconds
-let capture_fps = 60;         // Render FPS: use 24 or 30 for faster test renders, 60 for final quality
-let capturer = null;
-let is_capturing = false;
-let is_capture_finished = false;
-let captured_video_element = null;
-let captured_video_blob_url = null; // Saved so we can restart the video from scratch on replay
-let capture_frame_count = 0;
-// ------------------------
+
 
 let canvas_width = 800; let canvas_height = 600;
 let keyframe_version = 24; // This represents the unit of frames we use in our keyframe list
-let framerate = 60; // This represents the framerate of our animation
+let framerate = 24/1; // This represents the framerate of our animation
 let editor_mode = 'editor';
+// let editor_mode = 'loop';
 // 'animation' or '' - runs the animation
 // 'fixed' - fixes the animation at a frame frame_start
 // 'forward' - starts at frame frame_start and moves forward
@@ -329,6 +239,7 @@ let editor_mode = 'editor';
 // 'editor_forward' - same as 'editor' but the animation is playing forward by default
 
 
+// let [ frame_start, frame_end ] = [ 1105, 1105+60 ]; // Ends exactly when the last scene finishes
 let [ frame_start, frame_end ] = [ 0, 1335 ]; // Ends exactly when the last scene finishes
 let [ time_start, time_end ] = [ frame_start / keyframe_version, frame_end / keyframe_version ]; // in seconds
 // let debug_axes = true; // Toggle this to see boxes on the arms to represent direction
@@ -338,7 +249,7 @@ let scenes_list = [];
 let subtitle_manager;
 
 
-let rendering_div;
+
 
 function setup() {
 	// WebGL requires this attribute to allow capturing tools to read the canvas pixels without getting a blank screen!
@@ -349,14 +260,7 @@ function setup() {
 
 	noStroke();
 
-	rendering_div = createDiv("Rendering video... Please wait.");
-	rendering_div.position(10, 10);
-	rendering_div.style('color', 'white');
-	rendering_div.style('font-size', '24px');
-	rendering_div.style('background', 'black');
-	rendering_div.style('padding', '10px');
-	rendering_div.style('z-index', '1000');
-	rendering_div.hide();
+
 
 	initPuppetVariables(); initPuppetGeometries(); // initializes the variables and geometries for the puppet
 	initHandVariablesAndGeometries(); // initializes the variables and geometries for the hand
@@ -379,82 +283,22 @@ function setup() {
 	scenes_list.push(new Scene_12_Falling(1092, 1256));
 	scenes_list.push(new Scene_13_Hit(1256, 1267));
 	scenes_list.push(new Scene_14_Dismantled(1267, 1335));
-	// scenes_list.push(new Scene_13_Hit(, 1333));
 
-	subtitle_manager = new SubtitleManager(fontBeforeStart);
-
-	
-
-	// camera(1532, -17, 93, 33, -1, 81);
-	// camera(-1751, -2875, -3289, 80, 10, 45);
-
-
-	// --- CAPTURE INITIALIZATION ---
-	console.log('[CAPTURE] play_pre_rendered =', play_pre_rendered);
-	console.log('[CAPTURE] typeof CCapture =', typeof CCapture);
-	if (play_pre_rendered) {
-		if (typeof CCapture === 'undefined') {
-			console.error('[CAPTURE] ERROR: CCapture is not defined! The CDN script did not load. Falling back to live mode.');
-			play_pre_rendered = false;
-		} else {
-			try {
-				is_capturing = true;
-				capturer = new CCapture({
-					format: 'webm',
-					framerate: capture_fps,
-					verbose: false
-				});
-				capturer.start();
-				console.log('[CAPTURE] CCapture started successfully! Rendering begins...');
-				// KEY FIX: noLoop() + redraw() gives the browser time to fully encode
-				// each frame before starting the next, instead of flooding the encoder.
-				noLoop();
-				redraw();
-			} catch (e) {
-				console.error('[CAPTURE] CCapture threw an error! Falling back to live mode.', e);
-				play_pre_rendered = false;
-				is_capturing = false;
-			}
-		}
-	}
-	// ------------------------------
+	subtitle_manager = new SubtitleManager(font_loaded); // create subtitle manager
 }
 
 let time_current;
 
 function draw() {
-	// Diagnostic: log state every 60 frames ONLY when capturing, so we don't spam the console later
-	if (is_capturing && frameCount % 60 === 1) {
-		console.log('[DRAW] capturing active... frameCount:', frameCount, '| time_current:', (time_current != null ? time_current.toFixed(2) : 'N/A'), '| capture_frame_count:', capture_frame_count);
-	}
-
-	// 1. PLAYBACK MODE (Video is a CSS overlay - just keep the canvas black beneath it)
-	if (play_pre_rendered && is_capture_finished) {
-		clear();
-		background(0); // Black canvas under the overlay
-		return; 
-	}
-
-	// 2. LIVE MODE OR CAPTURING MODE
 	clear();
 	background(50);
-	perspective(2*atan(height/2/800),width/height,0.1*800, 30 * 800);
-	if (!is_capturing) 
-		if (typeof debug_camera_control !== 'undefined' && debug_camera_control === true) {
-			orbitControl(); // Only allow orbitControl in live mode
-		}
-		// orbitControl();
-	
-	// --- TIME LOGIC ---
-	if (play_pre_rendered && is_capturing) {
-		// Force time_current to perfectly increment from time_start
-		time_current = time_start + (capture_frame_count / capture_fps);
-	} else {
-		// initialText(); // only show initial text if live mode
-		time_current = findTimeCurrent();
+	perspective(2*atan(height/2/800),width/height,0.1*800, 30 * 800); // increase 'far'
+	if (typeof debug_camera_control !== 'undefined' && debug_camera_control === true) { // debug orbitControl()
+		orbitControl(); // Only allow orbitControl in live mode
 	}
+	time_current = findTimeCurrent(); // find current time (based on editor_mode)
 	
-	// Run Scenes ----------------------
+	// ------------------------------ Display Scenes ----------------------
 	for (let i = scenes_list.length - 1; i >= 0; i--) {
 		let scene = scenes_list[i];
 		if (scene.isActive(time_current * keyframe_version)) {
@@ -463,12 +307,12 @@ function draw() {
 		}
 	}
 
-	// Draw Subtitles over the 3D scene
+	// display subtitles on top of scenes
 	subtitle_manager.display(time_current, time_current * keyframe_version);
 
 
-	// code for debugging (axes, plane)
-	if (typeof debug_axes !== 'undefined' && debug_axes) {
+	// debug axes
+	if (typeof debug_axes !== 'undefined' && debug_axes) { 
 		push();
 		strokeWeight(4);
 		stroke(255, 0, 0);
@@ -479,8 +323,8 @@ function draw() {
 		line(0, 0, 0, 0, 0, 900);
 
 		// Draw numbers
-		if (typeof fontBeforeStart !== 'undefined') {
-			textFont(fontBeforeStart);
+		if (typeof font_loaded !== 'undefined') {
+			textFont(font_loaded);
 			textSize(16);
 			textAlign(CENTER, CENTER);
 			noStroke();
@@ -508,62 +352,7 @@ function draw() {
 	}
 	// ------------------------------ AI GENERATED END: OrbitControl Camera Info UI ------------------------------
 
-	// --- CAPTURE SAVING LOGIC ---
-	if (play_pre_rendered && is_capturing) {
-		capturer.capture(document.getElementById('defaultCanvas0'));
-		capture_frame_count++;
 
-		// Determine the target end time (test mode or full animation)
-		let capture_end_time = (capture_test_seconds > 0) ? (time_start + capture_test_seconds) : time_end;
-
-		// Log progress every 30 frames (every 0.5 seconds)
-		if (capture_frame_count % 30 === 0) {
-			let total_frames = (capture_end_time - time_start) * framerate;
-			console.log('[CAPTURE] Frame ' + capture_frame_count + ' / ' + Math.floor(total_frames) + ' | time_current: ' + time_current.toFixed(2) + 's');
-		}
-
-		// Update HTML loading screen
-		rendering_div.show();
-		let total_frames = (capture_end_time - time_start) * framerate;
-		rendering_div.html("Rendering video... Please wait.<br>Frame " + capture_frame_count + " / " + Math.floor(total_frames));
-		
-		if (time_current >= capture_end_time) {
-			console.log('[CAPTURE] All frames captured! Encoding WebM...');
-			is_capturing = false;
-			capturer.stop();
-			rendering_div.html("Processing WebM... Almost done!");
-			
-			capturer.save((blob) => {
-				console.log('[CAPTURE] WebM blob ready! Size:', (blob.size / 1024 / 1024).toFixed(1), 'MB');
-				captured_video_blob_url = URL.createObjectURL(blob);
-
-				// Create a raw <video> DOM element and overlay it on the canvas using CSS
-				let canvas_elt = document.getElementById('defaultCanvas0');
-				let vid = document.createElement('video');
-				vid.src = captured_video_blob_url;
-				vid.style.position = 'absolute';
-				vid.style.left = canvas_elt.offsetLeft + 'px';
-				vid.style.top = canvas_elt.offsetTop + 'px';
-				vid.style.width = canvas_width + 'px';
-				vid.style.height = canvas_height + 'px';
-				vid.style.zIndex = '500';
-				vid.style.pointerEvents = 'none'; // Prevent the video from intercepting mouse clicks
-				vid.volume = 0;
-				document.body.appendChild(vid);
-				captured_video_element = new p5.Element(vid);
-
-				is_capture_finished = true;
-				rendering_div.hide();
-				loop();
-				setupPlaybackUI(vid); // Wire up UI and song sync
-				console.log('[CAPTURE] Playback ready! Press Space to play.');
-			});
-		} else {
-			// Schedule the next frame after a short delay so the browser can breathe
-			setTimeout(() => redraw(), 0);
-		}
-	}
-	// ----------------------------
 }
 
 

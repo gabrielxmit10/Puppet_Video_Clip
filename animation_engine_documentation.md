@@ -129,8 +129,7 @@ Manages the giant floating hand. Default rotation order for fingers is `'ZYX'`.
 ### Animation Methods
 
 - **Rotation**:
-  - `addRotationX(s, kf)` / `addRotationZ(s, kf)`: Applies to any joint.
-  - `addRotationY(s, kf)`: Applies **only** to `'arm'` and `'palm'`. Finger joints physically cannot rotate on the Y-axis. If you pass a non-zero Y value to a finger joint, the engine will safely ignore it and print a warning to the console.
+  - `addRotationX(s, kf)` / `addRotationY(s, kf)` / `addRotationZ(s, kf)`: Applies to any joint, including fingers.
   - `addRotation(s, kf)`: Rotates all available axes. `kf.value` must be `[x, y, z]`.
   
   **Grouped Finger Targeting Tip**

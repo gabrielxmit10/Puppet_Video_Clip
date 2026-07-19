@@ -82,8 +82,6 @@ class Shot {
 
 function find_kf_and_type(frame_current, kf_list) { // finds the 2 keyframes that frame_current is between and the type of lerp of the keyframe before it
 
-    // -------------------- AI GENERATED START --------------------
-
     // Handling list with not enough keyframes
     if (kf_list.length < 2) { // throw error
         throw new Error("find_kf_and_type() requires at least 2 keyframes to find an interval.");
@@ -94,17 +92,17 @@ function find_kf_and_type(frame_current, kf_list) { // finds the 2 keyframes tha
     let found_index = 0;
 
     // Binary search to find the correct interval [i, i+1]
-    while (low <= high) {
+    while (low <= high) { 
         let mid = Math.floor((low + high) / 2);
         let kf1 = kf_list[mid];
         let kf2 = kf_list[mid + 1];
 
-        if (frame_current >= kf1.time && frame_current <= kf2.time) {
+        if (frame_current >= kf1.time && frame_current <= kf2.time) { // if frame_current is between these 2 kfs, we've found the correct interval
             found_index = mid;
             break;
-        } else if (frame_current < kf1.time) {
+        } else if (frame_current < kf1.time) { // if frame_current is before kf1, we need to look at the left half
             high = mid - 1;
-        } else {
+        } else { // if frame_current is after kf2, we need to look at the right half
             low = mid + 1;
         }
     }
@@ -118,16 +116,14 @@ function find_kf_and_type(frame_current, kf_list) { // finds the 2 keyframes tha
 
     // Find the type of lerp by looking backwards for the last informed type
     let type_of_lerp = KeyFrame.DEFAULT_TYPE_OF_LERP;
-    for (let i = found_index; i >= 0; i--) {
-        if (kf_list[i].type_of_lerp !== KeyFrame.NO_TYPE_OF_LERP) {
+    for (let i = found_index; i >= 0; i--) { // if not set, look backwards 
+        if (kf_list[i].type_of_lerp !== KeyFrame.NO_TYPE_OF_LERP) { 
             type_of_lerp = kf_list[i].type_of_lerp;
             break;
         }
     }
 
     return [kf1, kf2, type_of_lerp];
-
-    // -------------------- AI GENERATED END --------------------
 
 }
 
@@ -240,34 +236,38 @@ function interpolate_hermiteSimple(t, v0, v1) { // interpolates from 0 to 1 usin
     return (-2 * t3 + 3 * t2) + (t3 - 2 * t2 + t) * v0 + (t3 - t2) * v1;
 }
 
-function interpolate_bezierSimple(t, x0, y0, x1, y1) { // interpolates from 0 to 1 using the given 4 values as control points
-    // -------------------- AI GENERATED START --------------------
-    
-    if (t === 0 || t === 1) return t;
+function interpolate_bezierSimple(bezier_x, x0, y0, x1, y1) { // interpolates from 0 to 1 using the given 4 values as control points
 
-    // Binary search to find u such that bezier_x(u) == t
+    if (bezier_x === 0 || bezier_x === 1) return bezier_x; // the endpoints are the same, no need to calculate
+
+    // we want to find bezier_y based on bezier_x, so we need to find 'u' such that bezier_x(u) == bezier_x
+
+    // Binary search to find u such that bezier_x(u) == bezier_x, 
+    //      so that we can find bezier_y for that u
     let u_low = 0;
     let u_high = 1;
-    let u = t; // initial guess
+    let u = bezier_x; // initial guess
+    let iterations = 15; // limit search to 15 iterations
     
-    for (let i = 0; i < 15; i++) {
-        // Evaluate Bezier X
+    for (let i = 0; i < iterations; i++) {
+        // evaluate bezier x for current u
         let u_inv = 1 - u;
-        let current_x = 3 * u_inv*u_inv * u * x0 + 3 * u_inv * u*u * x1 + u*u*u;
+        // bezier formula simplified considering p0=(0,0) and p3=(1,1)
+        let current_x = 3 * u_inv*u_inv * u * x0 + 3 * u_inv * u*u * x1 + u*u*u; 
         
-        if (Math.abs(current_x - t) < 0.001) break;
+        // get out of loop if we found a close enough x for current u
+        if (Math.abs(current_x - bezier_x) < 0.001) break;
         
-        if (current_x < t) u_low = u;
-        else u_high = u;
+        if (current_x < bezier_x) u_low = u; // if we are under the value, make the low go to u
+        else u_high = u; // if we are above, make the high go to u
         
         u = (u_low + u_high) / 2;
     }
 
-    // Return Bezier Y for the found u
+    // return bezier y for the found u
     let u_inv = 1 - u;
+    // bezier formula simplified considering p0=(0,0) and p3=(1,1)
     return 3 * u_inv*u_inv * u * y0 + 3 * u_inv * u*u * y1 + u*u*u;
-
-    // -------------------- AI GENERATED END --------------------
 }
 
 function interpolate_values(value1, value2, t_new) { // handles the structure of the data (p5.Vector, Array, or Number)

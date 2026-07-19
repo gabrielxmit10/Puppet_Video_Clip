@@ -244,7 +244,7 @@ class Stage {
         this.procedural_functions = {};
     }
 
-    #pushKeyFrame(kf, ordered_kf_list) { 
+    pushKeyFrame(kf, ordered_kf_list) { 
         if (ordered_kf_list.length == 0) { 
             if (kf.type_of_lerp == KeyFrame.NO_TYPE_OF_LERP) kf.type_of_lerp = KeyFrame.DEFAULT_TYPE_OF_LERP;
             ordered_kf_list.push(kf);
@@ -276,17 +276,17 @@ class Stage {
 
     addTranslationX(s, kf) { 
         if (this.trans_kfs_map[s]) {
-            this.#pushKeyFrame(kf, this.trans_kfs_map[s].x);
+            this.pushKeyFrame(kf, this.trans_kfs_map[s].x);
         }
     }
     addTranslationY(s, kf) { 
         if (this.trans_kfs_map[s]) {
-            this.#pushKeyFrame(kf, this.trans_kfs_map[s].y);
+            this.pushKeyFrame(kf, this.trans_kfs_map[s].y);
         }
     }
     addTranslationZ(s, kf) { 
         if (this.trans_kfs_map[s]) {
-            this.#pushKeyFrame(kf, this.trans_kfs_map[s].z);
+            this.pushKeyFrame(kf, this.trans_kfs_map[s].z);
         }
     }
     addTranslation(s, kf) { 
@@ -294,9 +294,9 @@ class Stage {
             let kf_x = new KeyFrame(kf.time, kf.value[0], kf.type_of_lerp, kf.velocity);
             let kf_y = new KeyFrame(kf.time, kf.value[1], kf.type_of_lerp, kf.velocity);
             let kf_z = new KeyFrame(kf.time, kf.value[2], kf.type_of_lerp, kf.velocity);
-            this.#pushKeyFrame(kf_x, this.trans_kfs_map[s].x);
-            this.#pushKeyFrame(kf_y, this.trans_kfs_map[s].y);
-            this.#pushKeyFrame(kf_z, this.trans_kfs_map[s].z);
+            this.pushKeyFrame(kf_x, this.trans_kfs_map[s].x);
+            this.pushKeyFrame(kf_y, this.trans_kfs_map[s].y);
+            this.pushKeyFrame(kf_z, this.trans_kfs_map[s].z);
         }
     }
 
@@ -308,7 +308,7 @@ class Stage {
         }
     }
 
-    #applyTranslation(time_current, tkf_list, part_name = null) { 
+    applyTranslation(time_current, tkf_list, part_name = null) { 
         let trans_x = tkf_list.x.length > 0 ? animate_kfs(time_current, tkf_list.x) : 0;
         let trans_y = tkf_list.y.length > 0 ? animate_kfs(time_current, tkf_list.y) : 0;
         let trans_z = tkf_list.z.length > 0 ? animate_kfs(time_current, tkf_list.z) : 0;
@@ -345,7 +345,7 @@ class Stage {
             // Right curtains
             push(); 
                 scale(0.5, 1, 1);
-                this.#applyTranslation(time_current, this.right_curtains_trans_kfs, 'right_curtains');
+                this.applyTranslation(time_current, this.right_curtains_trans_kfs, 'right_curtains');
                 model(stage_side_curtains_shape);
             pop();
             
@@ -353,7 +353,7 @@ class Stage {
             push(); 
                 scale(0.5, 1, 1);
                 scale(-1, 1, 1);
-                this.#applyTranslation(time_current, this.left_curtains_trans_kfs, 'left_curtains');
+                this.applyTranslation(time_current, this.left_curtains_trans_kfs, 'left_curtains');
                 model(stage_side_curtains_shape);
             pop();
         pop();

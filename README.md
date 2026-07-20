@@ -4,7 +4,7 @@ This is an animated music video created entirely with code using the **p5.js** l
 
 This project was developed as the final assignment for my Computer Graphics college course at UFRJ. The assignment was open-ended—we had to code something of our choice using p5.js. I decided to explore the intersection of code and music, which led to the creation of this music video.
 
-[**Watch the final animation on YouTube**](INSERT_YOUTUBE_LINK_HERE)
+[**Watch the final animation on YouTube**](https://youtu.be/x9VpmDeTYeM?si=qDOJiLxVpJ67M16l)
 
 ## 🛠️ Built With
 * [p5.js](https://p5js.org/) - JavaScript library for creative coding

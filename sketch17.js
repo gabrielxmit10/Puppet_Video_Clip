@@ -172,7 +172,7 @@ function preload() {
 	// Load the texture before setup runs
 	// P5 requires textures to be in the same folder or have valid CORS setup
 	head_tex = loadImage('media/head_texture.jpg');
-	song = loadSound('media/Puppet_(John_Michael_Howell).mp3');
+	song = loadSound('media/audio.mp3');
   	font_loaded = loadFont('media/Roboto-VariableFont_wdth,wght.ttf');
 }
 

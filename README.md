@@ -1,5 +1,7 @@
 # Puppet - p5.js Music Video Animation
 
+![Puppet Music Video Thumbnail](media/thumbnail_puppet.png)
+
 This is an animated music video created entirely with code using the **p5.js** library, synchronized to the song *"Puppet"* by John Michael Howell. 
 
 This project was developed as the final assignment for my Computer Graphics college course at UFRJ. The assignment was open-ended—we had to code something of our choice using p5.js. I decided to explore the intersection of code and music, which led to the creation of this music video.
